@@ -185,10 +185,19 @@ PEOPLE = {
     'officer':  dict(shirt='#1f3a6b', pants='#1f2a44', hair='#1d1a1a', adult=True, hat='#1f3a6b', vest='#d7ff3a'),
     'kid2':     dict(shirt='#2fa84f', pants='#3c4048', hair='#5a3a20', bag='#ff9f1c'),
     'kid3':     dict(shirt='#ffd23f', pants='#e2463b', hair='#1d1a1a', bag='#5bc0eb', long_hair=True, skirt=True),
+    'pharmacist': dict(shirt='#f4f6f8', pants='#5a6a7a', hair='#2b1d14', adult=True, glasses=True, long_hair=True),
+    'master':   dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#1d1a1a', adult=True, shoes='#e8c8a8'),
+    'kid_dobok': dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#3a2a20', shoes='#e8c8a8'),
+    'scientist': dict(shirt='#eef4f8', pants='#3c4048', hair='#6a4a2a', adult=True, glasses=True),
 }
+BELT = {'master': '#1d1a1a', 'kid_dobok': '#ffd23f'}
 for name, kw in PEOPLE.items():
     for f in (0, 1):
-        save(f'{name}_{f}', person(step=f, **kw), vox=0.075, note='person')
+        pv = person(step=f, **kw)
+        if name in BELT:                      # 도복 띠
+            lz = 10 if kw.get('adult') else 6
+            pv.box(3, 9, 3, 7, lz, lz, BELT[name]); pv.box(5, 6, 7, 7, lz - 2, lz - 1, BELT[name])
+        save(f'{name}_{f}', pv, vox=0.075, note='person')
 save('kid_helmet_0', person(step=0, helmet='#2fa84f', **{k: v for k, v in PEOPLE['kid'].items() if k != 'hat'}), vox=0.075, note='person')
 save('kid_helmet_1', person(step=1, helmet='#2fa84f', **{k: v for k, v in PEOPLE['kid'].items() if k != 'hat'}), vox=0.075, note='person')
 save('kid_duck', person(step=0, arms_up=True, **PEOPLE['kid']), vox=0.075, note='person')
@@ -1492,6 +1501,280 @@ def rug():
 
 
 save('rug', rug(), note='prop')
+
+
+# ---------------- 새 건물 안 + 실내 미션 소품 ----------------
+def bag_floor():                        # 통로에 놓인 책가방(걸려 넘어짐)
+    v = Vox(12, 8, 10)
+    v.box(1, 10, 1, 6, 0, 8, '#e2463b'); v.box(2, 9, 6, 7, 1, 5, '#c2312a'); v.box(3, 8, 7, 7, 2, 4, '#ffd23f'); v.box(4, 7, 0, 0, 7, 9, '#2b2b33')
+    return v
+save('bag_floor', bag_floor(), note='prop')
+
+
+def multitap():                         # 문어발 콘센트
+    v = Vox(16, 12, 4)
+    v.box(2, 13, 4, 7, 0, 2, '#f4f6f8')
+    for x in range(3, 13, 2): v.put(x, 5, 3, '#2b2b33')
+    for i, (x, y) in enumerate([(1, 0), (5, 1), (9, 0), (14, 1), (0, 11), (7, 11), (13, 10)]):
+        c = ['#2b2b33', '#e2463b', '#2f7de1', '#ffd23f'][i % 4]
+        v.box(min(x, 7), max(x, 7), y, y, 0, 0, c); v.box(x, x, min(y, 6), max(y, 6), 0, 0, c)
+    v.box(6, 9, 5, 6, 3, 3, '#ff6b2c', glow=True)
+    return v
+save('multitap', multitap(), note='prop')
+
+
+def scissors():                         # 책상 위 펼쳐진 가위
+    v = Vox(12, 12, 10)
+    v.box(0, 11, 0, 11, 7, 8, '#e8c08a'); v.box(1, 2, 1, 2, 0, 6, '#8a6a42'); v.box(9, 10, 9, 10, 0, 6, '#8a6a42'); v.box(1, 2, 9, 10, 0, 6, '#8a6a42'); v.box(9, 10, 1, 2, 0, 6, '#8a6a42')
+    for i in range(6): v.put(3 + i, 3 + i, 9, '#c8ced4'); v.put(8 - i, 3 + i, 9, '#c8ced4')
+    v.box(2, 3, 8, 9, 9, 9, '#e2463b'); v.box(8, 9, 8, 9, 9, 9, '#e2463b')
+    return v
+save('scissors', scissors(), note='prop')
+
+
+def puddle():                           # 젖은 바닥(물 웅덩이)
+    v = Vox(16, 12, 1)
+    for x in range(16):
+        for y in range(12):
+            if ((x - 8) / 7.5) ** 2 + ((y - 6) / 5.5) ** 2 <= 1 - 0.15 * ((x * 7 + y * 3) % 3 == 0):
+                v.put(x, y, 0, '#8fd0f0' if (x + y) % 5 else '#d8f2ff', glow=True)
+    return v
+save('puddle', puddle(), note='prop')
+
+
+def box_stack():                        # 높이 쌓여 기울어진 상자
+    v = Vox(14, 12, 30)
+    for i, (dx, c) in enumerate([(0, '#c8955a'), (1, '#b88548'), (2, '#c8955a'), (3, '#d8a56a'), (4, '#b88548')]):
+        v.box(1 + dx, 9 + dx, 1, 10, i * 6, i * 6 + 5, c); v.box(1 + dx, 9 + dx, 10, 10, i * 6 + 2, i * 6 + 3, '#8a6a42')
+    return v
+save('box_stack', box_stack(), note='prop')
+
+
+def cable_floor():                      # 바닥을 가로지르는 전선
+    v = Vox(30, 8, 2)
+    for x in range(30): v.box(x, x, 3 + int(2 * np.sin(x / 3)), 3 + int(2 * np.sin(x / 3)), 0, 0, '#2b2b33')
+    v.box(26, 29, 2, 5, 0, 1, '#f4f6f8')
+    return v
+save('cable_floor', cable_floor(), note='prop')
+
+
+def pot_handle():                       # 손잡이가 바깥으로 나온 냄비
+    v = Vox(16, 20, 12)
+    v.cyl(8, 7, 6, 0, 7, '#9aa3ad'); v.cyl(8, 7, 5, 7, 7, '#e2463b'); v.box(7, 9, 13, 19, 5, 6, '#2b2b33')
+    for (x, y) in [(6, 5), (10, 8), (8, 4)]: v.put(x, y, 8, '#f4f1ea')
+    return v
+save('pot_handle', pot_handle(), note='prop')
+
+
+def med_shelf():                        # 약국 약장
+    v = Vox(40, 10, 28)
+    v.box(0, 39, 0, 9, 0, 27, '#f4f6f8'); v.clear(1, 38, 3, 9, 1, 26)
+    cols = ['#2f7de1', '#e2463b', '#2fa84f', '#ffd23f', '#ffffff', '#ff9f1c']
+    for z0 in (1, 8, 15, 22):
+        v.box(1, 38, 3, 9, z0 - 1 if z0 > 1 else 0, z0 - 1 if z0 > 1 else 0, '#d9dde2')
+        for x in range(2, 38, 3): v.box(x, x + 1, 4, 7, z0, z0 + 2 + (x % 3), cols[(x + z0) % 6])
+    v.box(14, 25, 0, 0, 24, 27, '#2fa84f'); v.box(19, 20, 0, 0, 25, 26, '#ffffff')
+    return v
+save('med_shelf', med_shelf(), note='prop')
+
+
+def pharm_counter():
+    v = Vox(40, 12, 14)
+    v.box(0, 39, 0, 11, 0, 10, '#ffffff'); v.box(0, 39, 0, 11, 11, 11, '#2fa84f'); v.box(0, 39, 11, 11, 2, 4, '#2fa84f')
+    v.box(30, 35, 3, 8, 12, 15, '#2b2b33'); v.box(31, 34, 8, 8, 13, 14, '#5bc0eb', glow=True)
+    v.box(6, 11, 3, 7, 12, 13, '#e8eef2'); v.box(15, 18, 4, 6, 12, 13, '#ffd23f')
+    return v
+save('pharm_counter', pharm_counter(), note='prop')
+
+
+def pill_bottle():                      # 낮은 탁자 위 알약통(뚜껑 열림)
+    v = Vox(14, 12, 14)
+    v.box(0, 13, 0, 11, 6, 7, '#c8955a'); v.box(1, 2, 1, 2, 0, 5, '#8a6a42'); v.box(11, 12, 9, 10, 0, 5, '#8a6a42'); v.box(1, 2, 9, 10, 0, 5, '#8a6a42'); v.box(11, 12, 1, 2, 0, 5, '#8a6a42')
+    v.cyl(5, 5, 2.5, 8, 13, '#ff9f1c'); v.box(4, 6, 6, 6, 9, 11, '#ffffff')
+    for (x, y, c) in [(9, 4, '#ff6b8b'), (10, 7, '#ffd23f'), (8, 8, '#5bc0eb'), (11, 5, '#ff6b8b')]: v.put(x, y, 8, c)
+    return v
+save('pill_bottle', pill_bottle(), note='prop')
+
+
+def syrup():                            # 냉장고 옆 바닥에 놓인 물약
+    v = Vox(8, 8, 14)
+    v.cyl(4, 4, 3, 0, 9, '#c8653a'); v.cyl(4, 4, 1.5, 10, 13, '#ffffff'); v.box(1, 6, 7, 7, 3, 7, '#ffffff'); v.box(2, 5, 7, 7, 4, 5, '#e2463b')
+    return v
+save('syrup', syrup(), note='prop')
+
+
+def gummy_jar():                        # 사탕처럼 생긴 영양제 통
+    v = Vox(10, 10, 14)
+    v.cyl(5, 5, 4, 0, 10, '#e8f6ff'); v.cyl(5, 5, 4, 11, 13, '#ff6b8b')
+    for z in range(1, 10, 2):
+        for (x, y) in [(3, 2), (6, 3), (2, 6), (7, 7), (5, 8)]: v.put(x, y + (z % 3) - 1, z, ['#ff6b8b', '#ffd23f', '#2fa84f', '#ff9f1c'][(x + z) % 4])
+    v.box(2, 7, 9, 9, 4, 7, '#ffffff')
+    return v
+save('gummy_jar', gummy_jar(), note='prop')
+
+
+def punch_bag():
+    v = Vox(10, 10, 32)
+    v.box(4, 5, 4, 5, 28, 31, '#5b626b'); v.cyl(5, 5, 4, 4, 27, '#e2463b'); v.cyl(5, 5, 4, 4, 5, '#2b2b33'); v.cyl(5, 5, 4, 26, 27, '#2b2b33')
+    v.box(1, 8, 1, 8, 0, 0, '#2b2b33')
+    return v
+save('punch_bag', punch_bag(), note='prop')
+
+
+def trophy_shelf():
+    v = Vox(36, 8, 26)
+    v.box(0, 35, 0, 7, 0, 25, '#8a6a42'); v.clear(1, 34, 2, 7, 1, 24)
+    for z0 in (1, 13):
+        v.box(1, 34, 2, 7, z0 + 10, z0 + 10, '#a87a45')
+        for x in range(3, 34, 6):
+            v.box(x, x + 2, 4, 5, z0, z0 + 1, '#5b626b'); v.box(x + 1, x + 1, 4, 5, z0 + 2, z0 + 4, '#ffd23f'); v.box(x, x + 2, 3, 6, z0 + 5, z0 + 7, '#ffd23f')
+    return v
+save('trophy_shelf', trophy_shelf(), note='prop')
+
+
+def shoe_loose():                       # 끈 풀린 운동화
+    v = Vox(14, 10, 5)
+    for x0 in (1, 8):
+        v.box(x0, x0 + 4, 1, 8, 0, 1, '#f4f6f8'); v.box(x0, x0 + 4, 1, 5, 2, 3, '#2f7de1'); v.box(x0 + 1, x0 + 3, 2, 3, 4, 4, '#2f7de1')
+    for i in range(6): v.put(6 + (i % 2), 9 - i // 2, 0, '#ffffff'); v.put(4 - i // 2, 9, 0, '#ffffff')
+    return v
+save('shoe_loose', shoe_loose(), note='prop')
+
+
+def dumbbell():
+    v = Vox(16, 6, 6)
+    v.box(3, 12, 2, 3, 2, 3, '#9aa3ad'); v.box(0, 3, 0, 5, 0, 5, '#2b2b33'); v.box(12, 15, 0, 5, 0, 5, '#2b2b33')
+    return v
+save('dumbbell', dumbbell(), note='prop')
+
+
+def elevator():                         # 엘리베이터 문(벽)
+    v = Vox(30, 4, 34)
+    v.box(0, 29, 0, 3, 0, 33, '#c8ced4'); v.box(4, 25, 3, 3, 0, 27, '#9aa3ad'); v.box(14, 15, 3, 3, 0, 27, '#5b626b')
+    v.box(10, 19, 3, 3, 29, 32, '#2b2b33'); v.box(12, 17, 3, 3, 30, 31, '#ff6b2c', glow=True)
+    return v
+save('elevator', elevator(), note='prop')
+
+
+def elev_panel():                       # 비상벨(인터폰) 버튼판
+    v = Vox(8, 3, 26)
+    v.box(0, 7, 0, 2, 12, 25, '#d9dde2')
+    for z in (14, 17, 20): v.box(2, 5, 2, 2, z, z + 1, '#f4f6f8')
+    v.box(1, 6, 2, 2, 22, 24, '#ffd23f', glow=True); v.box(3, 4, 2, 2, 23, 23, '#e2463b', glow=True)
+    return v
+save('elev_panel', elev_panel(), note='prop')
+
+
+def mailboxes():
+    v = Vox(30, 8, 22)
+    v.box(0, 29, 0, 7, 0, 21, '#9aa3ad')
+    for x in range(1, 29, 5):
+        for z in range(2, 20, 5): v.box(x, x + 3, 7, 7, z, z + 3, '#c8ced4'); v.put(x + 1, 7, z + 2, '#2b2b33')
+    return v
+save('mailboxes', mailboxes(), note='prop')
+
+
+def stairs_door():                      # 비상계단 문 + 초록 비상구 표시
+    v = Vox(20, 4, 34)
+    v.box(0, 19, 0, 3, 0, 33, '#d9dde2'); v.box(3, 16, 3, 3, 0, 26, '#7a8a9a'); v.box(13, 14, 3, 3, 12, 14, '#2b2b33')
+    v.box(4, 15, 3, 3, 28, 32, '#2fa84f', glow=True); v.box(6, 8, 3, 3, 29, 31, '#ffffff', glow=True)
+    return v
+save('stairs_door', stairs_door(), note='prop')
+
+
+def phone_stand():                      # 관리실 인터폰
+    v = Vox(10, 6, 24)
+    v.box(4, 5, 2, 3, 0, 14, '#5b626b'); v.box(1, 8, 1, 4, 15, 23, '#f4f6f8'); v.box(2, 7, 4, 4, 18, 21, '#5bc0eb', glow=True); v.box(3, 6, 4, 4, 16, 16, '#2fa84f')
+    return v
+save('phone_stand', phone_stand(), note='prop')
+
+
+def lab_table():                        # 과학실 실험대(검은 상판)
+    v = Vox(36, 18, 14)
+    v.box(0, 35, 0, 17, 0, 10, '#c8ced4'); v.box(0, 35, 0, 17, 11, 11, '#2b2b33')
+    v.box(15, 20, 6, 11, 12, 12, '#9aa3ad'); v.box(17, 18, 8, 9, 12, 16, '#c8ced4')
+    return v
+save('lab_table', lab_table(), note='prop')
+
+
+def goggles():                          # 보안경 바구니
+    v = Vox(14, 10, 8)
+    v.box(0, 13, 0, 9, 0, 4, '#2f7de1'); v.clear(1, 12, 1, 8, 1, 4)
+    for x0 in (2, 8): v.box(x0, x0 + 3, 3, 6, 4, 6, '#cfe8f5', glow=True); v.box(x0, x0 + 3, 3, 3, 4, 6, '#2b2b33')
+    v.box(6, 7, 4, 5, 5, 5, '#2b2b33')
+    return v
+save('goggles', goggles(), note='prop')
+
+
+def lab_coat():                         # 옷걸이의 실험복
+    v = Vox(12, 6, 30)
+    v.box(5, 6, 2, 3, 0, 29, '#8a6a42'); v.box(2, 9, 1, 4, 0, 0, '#8a6a42')
+    v.box(2, 9, 0, 1, 10, 25, '#ffffff'); v.box(1, 1, 0, 1, 14, 24, '#ffffff'); v.box(10, 10, 0, 1, 14, 24, '#ffffff'); v.box(5, 6, 0, 0, 12, 24, '#d9dde2')
+    return v
+save('lab_coat', lab_coat(), note='prop')
+
+
+def alcohol_lamp():                     # 켜진 알코올램프 + 뚜껑
+    v = Vox(10, 10, 14)
+    v.ball(4, 5, 3, 3.5, '#e8f6ff', rz=3); v.box(3, 5, 4, 6, 6, 7, '#9aa3ad')
+    v.box(4, 4, 5, 5, 8, 12, '#ffd23f', glow=True); v.box(3, 5, 5, 5, 8, 9, '#ff6b2c', glow=True)
+    v.cyl(8, 8, 1.5, 0, 3, '#c8ced4')
+    return v
+save('alcohol_lamp', alcohol_lamp(), note='prop')
+
+
+def beaker():                           # 연기 나는 비커(직접 냄새 맡기 X)
+    v = Vox(8, 8, 18)
+    v.cyl(4, 4, 3, 0, 8, '#cfe8f5'); v.cyl(4, 4, 2.5, 1, 5, '#8e5cd9')
+    for z in range(10, 18, 2): v.put(3 + (z % 4) // 2, 4, z, '#d8d0e8')
+    return v
+save('beaker', beaker(), note='prop')
+
+
+def skeleton_model():
+    v = Vox(12, 8, 34)
+    v.box(5, 6, 3, 4, 0, 3, '#5b626b'); v.box(2, 9, 2, 5, 0, 0, '#5b626b')
+    W = '#f4f1ea'
+    v.box(4, 4, 3, 4, 4, 15, W); v.box(7, 7, 3, 4, 4, 15, W); v.box(3, 8, 3, 4, 16, 17, W)
+    for z in (19, 21, 23, 25): v.box(3, 8, 3, 4, z, z, W)
+    v.box(5, 6, 3, 4, 16, 27, W); v.box(1, 1, 3, 4, 15, 25, W); v.box(10, 10, 3, 4, 15, 25, W); v.box(2, 9, 3, 4, 26, 26, W)
+    v.box(3, 8, 2, 6, 28, 33, W); v.put(4, 6, 31, '#2b2b33'); v.put(7, 6, 31, '#2b2b33')
+    return v
+save('skeleton_model', skeleton_model(), note='prop')
+
+
+def sink():
+    v = Vox(20, 12, 16)
+    v.box(0, 19, 0, 11, 0, 10, '#d9dde2'); v.box(2, 17, 2, 9, 10, 10, '#9aa3ad'); v.box(9, 10, 1, 2, 11, 15, '#c8ced4'); v.box(9, 10, 2, 5, 15, 15, '#c8ced4')
+    return v
+save('sink', sink(), note='prop')
+
+
+def apt_entrance():                     # 아파트 공동현관(외부)
+    v = Vox(40, 14, 40)
+    v.box(0, 39, 0, 3, 0, 39, '#d9cdb8')
+    v.box(10, 29, 3, 3, 0, 27, '#5b7f9e'); v.box(11, 18, 3, 3, 1, 26, '#a8d8f0', glow=True); v.box(21, 28, 3, 3, 1, 26, '#a8d8f0', glow=True)
+    v.box(6, 33, 3, 13, 30, 32, '#7a8a9a'); v.box(7, 8, 12, 13, 0, 29, '#7a8a9a'); v.box(31, 32, 12, 13, 0, 29, '#7a8a9a')
+    v.box(14, 25, 3, 3, 34, 37, '#2f5da8'); v.box(17, 22, 3, 3, 35, 36, '#ffffff')
+    v.box(8, 31, 4, 13, 0, 0, '#c8ced4'); v.box(32, 35, 3, 4, 10, 15, '#2b2b33'); v.box(33, 34, 4, 4, 12, 14, '#5bc0eb', glow=True)
+    return v
+save('apt_entrance', apt_entrance(), note='prop')
+
+
+def school_door():                      # 학교 옆문(과학실 쪽)
+    v = Vox(24, 10, 32)
+    v.box(0, 23, 0, 2, 0, 31, '#e8dcc8'); v.box(5, 18, 2, 2, 0, 22, '#7da7c9'); v.box(6, 11, 2, 2, 2, 20, '#cfe8f5', glow=True); v.box(12, 17, 2, 2, 2, 20, '#cfe8f5', glow=True)
+    v.box(2, 21, 2, 9, 24, 25, '#2fa84f'); v.box(4, 19, 2, 2, 27, 30, '#ffffff'); v.box(7, 16, 2, 2, 28, 29, '#2f7de1')
+    return v
+save('school_door', school_door(), note='prop')
+
+
+def check_mark():                       # 찾은 물건 위 초록 체크
+    v = Vox(12, 3, 12)
+    for i in range(4): v.box(1 + i, 2 + i, 1, 1, 5 - i, 6 - i, '#2fa84f', glow=True)
+    for i in range(7): v.box(4 + i, 5 + i, 1, 1, 2 + i, 3 + i, '#2fa84f', glow=True)
+    return v
+save('check_mark', check_mark(), note='prop')
 
 
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
