@@ -1264,6 +1264,236 @@ def stool():
 save('stool', stool(), note='prop')
 
 
+# ---------------- 건물 안 꾸미기 (추가) ----------------
+def bookshelf():
+    v = Vox(30, 10, 26)
+    v.box(0, 29, 0, 9, 0, 25, '#a87a45'); v.clear(1, 28, 2, 9, 1, 24)
+    cols = ['#e2463b', '#2f7de1', '#ffd23f', '#2fa84f', '#ff9f1c', '#8e5cd9', '#f4f6f8']
+    for z0 in (1, 9, 17):
+        v.box(1, 28, 2, 9, z0 + 7, z0 + 7, '#8a6a42')
+        for x in range(1, 29):
+            if x % 7 == 6: continue
+            hgt = 4 + (x * 3) % 3
+            v.box(x, x, 3 + (x % 2), 8, z0, z0 + hgt, cols[(x + z0) % len(cols)])
+    return v
+
+
+save('bookshelf', bookshelf(), note='prop')
+
+
+def board_notice():                     # 교실 뒤 게시판(우리 반 작품)
+    v = Vox(50, 3, 26)
+    v.box(0, 49, 0, 2, 2, 25, '#c8955a'); v.box(1, 48, 2, 2, 3, 24, '#f2d9a8')
+    arts = [('#ff6b8b', '#ffd23f'), ('#5bc0eb', '#2fa84f'), ('#ffd23f', '#e2463b'), ('#8e5cd9', '#f4f6f8'), ('#2fa84f', '#ff9f1c')]
+    for i, (a, b) in enumerate(arts):
+        x = 3 + i * 9
+        for z in (5, 15):
+            v.box(x, x + 6, 2, 2, z, z + 7, '#ffffff'); v.box(x + 1, x + 5, 2, 2, z + 1, z + 4, a if z == 5 else b)
+            v.box(x + 2, x + 4, 2, 2, z + 5, z + 6, b if z == 5 else a)
+    v.box(18, 31, 2, 2, 24, 25, '#e2463b')
+    return v
+
+
+save('board_notice', board_notice(), note='prop')
+
+
+def wall_clock():
+    v = Vox(10, 2, 10)
+    for x in range(10):
+        for z in range(10):
+            d = (x - 4.5) ** 2 + (z - 4.5) ** 2
+            if d <= 21: v.put(x, 0, z, '#2b2b33')
+            if d <= 13: v.put(x, 1, z, '#ffffff')
+    v.box(4, 5, 1, 1, 5, 8, '#2b2b33'); v.box(5, 7, 1, 1, 4, 5, '#e2463b')
+    return v
+
+
+save('wall_clock', wall_clock(), note='prop')
+
+
+def plant_pot():
+    v = Vox(12, 12, 20)
+    v.cyl(6, 6, 4, 0, 6, '#c8653a'); v.cyl(6, 6, 4.5, 6, 7, '#a84e2a')
+    v.ball(6, 6, 12, 5, '#2fa84f', rz=6); v.ball(4, 5, 15, 3, '#4cc46a'); v.ball(8, 7, 14, 3, '#1f7a37')
+    return v
+
+
+save('plant_pot', plant_pot(), note='prop')
+
+
+def globe():
+    v = Vox(10, 10, 16)
+    v.box(3, 6, 3, 6, 0, 1, '#8a6a42'); v.box(4, 5, 4, 5, 2, 5, '#c8955a')
+    v.ball(4.5, 4.5, 10.5, 4.5, '#2f7de1')
+    for (x, y, z) in [(1, 4, 11), (2, 3, 12), (2, 5, 9), (7, 2, 11), (6, 8, 12), (3, 7, 10), (8, 5, 9)]:
+        v.ball(x, y, z, 1.5, '#2fa84f')
+    return v
+
+
+save('globe', globe(), note='prop')
+
+
+def cleaning_cab():                     # 청소함 + 빗자루
+    v = Vox(16, 10, 28)
+    v.box(0, 15, 0, 9, 0, 27, '#7da7c9'); v.box(7, 8, 9, 9, 1, 26, '#5b7f9e'); v.put(6, 9, 14, '#2b2b33'); v.put(9, 9, 14, '#2b2b33')
+    v.box(1, 6, 9, 9, 22, 25, '#ffffff')
+    return v
+
+
+save('cleaning_cab', cleaning_cab(), note='prop')
+
+
+def class_flag():                       # 칠판 위 태극기 액자
+    v = Vox(14, 2, 10)
+    v.box(0, 13, 0, 1, 0, 9, '#8a6a42'); v.box(1, 12, 1, 1, 1, 8, '#ffffff')
+    for x in range(5, 9):
+        for z in range(3, 7):
+            v.put(x, 1, z, '#e2463b' if z >= 5 else '#2f5da8')
+    for (x, z) in [(2, 7), (3, 7), (10, 7), (11, 7), (2, 2), (3, 2), (10, 2), (11, 2)]: v.put(x, 1, z, '#2b2b33')
+    return v
+
+
+save('class_flag', class_flag(), note='prop')
+
+
+def bottle_rack():                      # 물병·실내화 선반
+    v = Vox(30, 8, 14)
+    v.box(0, 29, 0, 7, 0, 0, '#c8ced4'); v.box(0, 29, 0, 7, 7, 7, '#c8ced4'); v.box(0, 0, 0, 7, 0, 13, '#9aa3ad'); v.box(29, 29, 0, 7, 0, 13, '#9aa3ad')
+    cols = ['#ff6b8b', '#5bc0eb', '#ffd23f', '#2fa84f', '#8e5cd9', '#ff9f1c']
+    for i, x in enumerate(range(2, 28, 4)):
+        v.box(x, x + 1, 3, 4, 8, 12, cols[i % 6]); v.box(x, x + 2, 1, 6, 1, 2, cols[(i + 2) % 6])
+    return v
+
+
+save('bottle_rack', bottle_rack(), note='prop')
+
+
+def atm():
+    v = Vox(14, 12, 28)
+    v.box(0, 13, 0, 11, 0, 27, '#d9dde2'); v.box(0, 13, 0, 11, 25, 27, '#2f7de1')
+    v.box(2, 11, 11, 11, 16, 22, '#5bc0eb', glow=True); v.box(3, 10, 11, 11, 12, 14, '#5b626b'); v.box(4, 9, 11, 11, 8, 9, '#2b2b33')
+    return v
+
+
+save('atm', atm(), note='prop')
+
+
+def coffee_machine():
+    v = Vox(20, 12, 22)
+    v.box(0, 19, 0, 11, 0, 9, '#8a6a42'); v.box(2, 17, 2, 10, 10, 21, '#2b2b33'); v.box(4, 9, 10, 10, 16, 19, '#e2463b', glow=True)
+    v.box(11, 15, 10, 11, 10, 13, '#ffffff'); v.box(12, 14, 9, 9, 17, 18, '#ffd23f', glow=True)
+    return v
+
+
+save('coffee_machine', coffee_machine(), note='prop')
+
+
+def ice_freezer():                      # 아이스크림 냉동고(윗면 유리)
+    v = Vox(30, 16, 12)
+    v.box(0, 29, 0, 15, 0, 11, '#ffffff'); v.box(0, 29, 15, 15, 2, 8, '#2f7de1'); v.clear(2, 27, 2, 13, 6, 11)
+    cols = ['#ff6b8b', '#ffd23f', '#8a5a3a', '#5bc0eb', '#2fa84f']
+    for x in range(2, 28, 2):
+        for y in range(2, 14, 3): v.box(x, x + 1, y, y + 1, 6, 7 + (x + y) % 3, cols[(x + y) % 5])
+    v.box(1, 28, 1, 14, 11, 11, '#cfe8f5', glow=True)
+    return v
+
+
+save('ice_freezer', ice_freezer(), note='prop')
+
+
+def ramen_station():                    # 컵라면 온수기 + 테이블
+    v = Vox(30, 12, 18)
+    v.box(0, 29, 0, 11, 9, 10, '#eef1f4'); v.box(1, 2, 1, 10, 0, 8, '#9aa3ad'); v.box(27, 28, 1, 10, 0, 8, '#9aa3ad')
+    v.box(3, 10, 2, 9, 11, 17, '#d9dde2'); v.box(5, 8, 9, 9, 12, 13, '#e2463b', glow=True)
+    for x in (14, 19, 24): v.cyl(x, 6, 2, 11, 14, '#ffd23f'); v.cyl(x, 6, 2, 14, 14, '#e2463b')
+    return v
+
+
+save('ramen_station', ramen_station(), note='prop')
+
+
+def mag_rack():
+    v = Vox(24, 8, 20)
+    v.box(0, 23, 0, 1, 0, 19, '#9aa3ad')
+    cols = ['#e2463b', '#2f7de1', '#ffd23f', '#ff6b8b', '#2fa84f', '#8e5cd9']
+    for row, z in enumerate((2, 8, 14)):
+        v.box(0, 23, 2, 7, z - 1, z - 1, '#c8ced4')
+        for i, x in enumerate(range(1, 23, 5)): v.box(x, x + 3, 3 + row % 2, 3 + row % 2, z, z + 5, cols[(i + row) % 6])
+    return v
+
+
+save('mag_rack', mag_rack(), note='prop')
+
+
+def umbrella_stand():
+    v = Vox(8, 8, 20)
+    v.cyl(4, 4, 3, 0, 8, '#5b626b')
+    for (x, y, c) in [(3, 3, '#2f7de1'), (5, 4, '#ffd23f'), (4, 5, '#e2463b')]:
+        v.box(x, x, y, y, 8, 17, c); v.box(x, x + 1, y, y, 18, 19, '#2b2b33')
+    return v
+
+
+save('umbrella_stand', umbrella_stand(), note='prop')
+
+
+def menu_board():                       # 분식집 벽 메뉴판
+    v = Vox(50, 3, 18)
+    v.box(0, 49, 0, 2, 0, 17, '#2b2b33'); v.box(1, 48, 2, 2, 1, 16, '#ffd23f')
+    items = ['#e2463b', '#ff9f1c', '#f4f1ea', '#2fa84f', '#8a5a3a']
+    for i, c in enumerate(items):
+        x = 3 + i * 9
+        v.box(x, x + 6, 2, 2, 8, 14, c); v.box(x, x + 6, 2, 2, 3, 5, '#2b2b33')
+    return v
+
+
+save('menu_board', menu_board(), note='prop')
+
+
+def tteok_pan():                        # 떡볶이 큰 판 + 어묵 통
+    v = Vox(34, 16, 14)
+    v.box(0, 33, 0, 15, 0, 8, '#c8ced4'); v.box(0, 33, 0, 15, 9, 9, '#9aa3ad')
+    v.box(2, 17, 2, 13, 10, 11, '#2b2b33'); v.box(3, 16, 3, 12, 11, 11, '#e2463b')
+    for (x, y) in [(5, 5), (8, 7), (11, 5), (13, 9), (6, 10), (10, 10), (14, 6)]: v.box(x, x + 1, y, y, 12, 12, '#f4f1ea')
+    v.box(20, 31, 2, 13, 10, 13, '#9aa3ad'); v.box(21, 30, 3, 12, 13, 13, '#c88a4a')
+    for x in range(22, 30, 3): v.box(x, x, 6, 6, 14, 13 + 1, '#e8c08a')
+    return v
+
+
+save('tteok_pan', tteok_pan(), note='prop')
+
+
+def water_purifier():
+    v = Vox(10, 10, 26)
+    v.box(0, 9, 0, 9, 0, 25, '#f4f6f8'); v.box(2, 7, 9, 9, 16, 22, '#5bc0eb', glow=True); v.box(3, 6, 9, 9, 10, 12, '#9aa3ad')
+    v.box(1, 8, 4, 9, 2, 3, '#c8ced4'); v.box(3, 4, 9, 9, 13, 13, '#e2463b'); v.box(5, 6, 9, 9, 13, 13, '#2f7de1')
+    return v
+
+
+save('water_purifier', water_purifier(), note='prop')
+
+
+def cushion_bench():                    # 분식집 벽쪽 긴 의자
+    v = Vox(40, 8, 12)
+    v.box(0, 39, 0, 7, 0, 4, '#8a6a42'); v.box(0, 39, 0, 7, 5, 6, '#e2463b'); v.box(0, 39, 0, 1, 7, 11, '#c2312a')
+    return v
+
+
+save('cushion_bench', cushion_bench(), note='prop')
+
+
+def rug():
+    v = Vox(40, 24, 1)
+    for x in range(40):
+        for y in range(24):
+            c = '#ffd23f' if (x // 4 + y // 4) % 2 else '#5bc0eb'
+            if x in (0, 39) or y in (0, 23): c = '#e2463b'
+            v.put(x, y, 0, c)
+    return v
+
+
+save('rug', rug(), note='prop')
+
+
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
 _ft = Image.open(os.path.join(OUT, '..', 'assets', 'firetruck_slices.png'))
 _ft.save(os.path.join(OUT, 'firetruck.png'))

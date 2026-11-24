@@ -41,6 +41,9 @@ h1 { font-size: 28px; margin: 8px 0 6px; color: #e2581f; letter-spacing: 1px; }
 #meter { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); width: 220px; background: rgba(255, 255, 255, .92); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
 .mb { height: 10px; background: #dde; border-radius: 6px; overflow: hidden; margin-top: 4px; }
 .mb i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #8a8f99, #3a3f48); }
+#actbtn { position: absolute; left: 50%; bottom: 78px; transform: translateX(-50%); pointer-events: auto; font-size: 20px; font-weight: 800; padding: 12px 22px; border-radius: 18px; background: #2fa84f; color: #fff; box-shadow: 0 5px 0 #1f7a37; white-space: nowrap; animation: pop 1s ease-in-out infinite alternate; }
+#actbtn:active { transform: translate(-50%, 3px); box-shadow: 0 2px 0 #1f7a37; }
+@keyframes pop { from { filter: brightness(1); } to { filter: brightness(1.15); } }
 #hint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font-size: 12px; color: #fff; background: rgba(0, 0, 0, .38); padding: 4px 12px; border-radius: 10px; white-space: nowrap; }
 #zoom { position: absolute; right: 10px; top: 160px; display: flex; flex-direction: column; gap: 6px; pointer-events: auto; }
 #zoom button { width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 253, 246, .92); font-size: 22px; font-weight: 800; color: #345; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
@@ -80,4 +83,6 @@ body.touch #hint { display: none; }
   #meter { top: auto; bottom: 196px; }
   #dtext { font-size: 16px; }
   #target { bottom: 118px; }
+  #actbtn { bottom: 122px; font-size: 17px; }
+  #target:has(+ #actbtn:not(.hidden)) { bottom: 176px; }
 }
