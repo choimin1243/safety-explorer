@@ -3,64 +3,68 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>안전 탐험대</title>
+<title>송명 안전 탐험대</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <canvas id="c"></canvas>
 
 <div id="hud" class="hidden">
-  <div id="missions">
-    <div class="mt">🧭 안전 탐험대</div>
-    <div class="m" id="m-road"><span class="badge">🚦</span><span>횡단보도 건너기</span></div>
-    <div class="m" id="m-fire"><span class="badge">🔥</span><span>화재 대피하기</span></div>
-    <div class="m" id="m-quake"><span class="badge">🌏</span><span>지진 대피하기</span></div>
+  <div id="panel">
+    <div class="pt" id="panel-toggle">🧭 미션 <b id="done-count">0</b>/10 <span class="star" id="star-total">⭐0</span></div>
+    <div id="mlist"></div>
   </div>
+  <canvas id="minimap" width="180" height="140"></canvas>
   <div id="banner"></div>
+  <div id="target"></div>
   <div id="meter" class="hidden"><div class="ml" id="meter-label">연기</div><div class="mb"><i id="meter-fill"></i></div></div>
-  <div id="hint">이동: 방향키 / WASD · 몸 낮추기: Shift · 확인: Space</div>
+  <div id="hint">이동 방향키·WASD · 몸 낮추기/브레이크 Shift · 말하기/손 흔들기 Space · 확대 +/−</div>
+  <div id="zoom"><button id="zin">＋</button><button id="zout">－</button></div>
   <div id="touch">
+    <button id="btn-act">💬<br>말하기</button>
     <button id="btn-crouch">몸<br>낮추기</button>
   </div>
   <div id="stick"><i></i></div>
 </div>
 
+<div id="dialog" class="hidden">
+  <div class="dwho"><canvas id="dface" width="64" height="64"></canvas><b id="dname"></b></div>
+  <p id="dtext"></p>
+  <div id="dchoices"></div>
+  <button id="dnext">다음 ▶</button>
+</div>
+
 <div id="title" class="screen">
   <div class="card">
     <div class="logo">🦺</div>
-    <h1>안전 탐험대</h1>
-    <p class="sub">우리 동네를 돌아다니며 안전 미션 3개를 해결해요!</p>
+    <h1>송명 안전 탐험대</h1>
+    <p class="sub">인천송명초 둘레 진짜 우리 동네에서 안전 미션 10개를 해결해요!</p>
     <ul class="list">
-      <li>🚦 초록불에 횡단보도로 건너기</li>
-      <li>🔥 연기 속에서 몸을 낮추고 비상구로</li>
-      <li>🌏 흔들리면 책상 밑, 멈추면 운동장으로</li>
+      <li>🚦 스쿨존 횡단보도 · 🚌 버스 정류장 · 🛴 킥보드</li>
+      <li>🚗 주차장 출입구 · 🛝 놀이터 · 🙅 모르는 사람</li>
+      <li>🔥 상가 화재 · 🌏 학교 지진 · 🚧 공사장 · 🚑 응급 119</li>
     </ul>
-    <input id="name" maxlength="10" placeholder="이름을 적어요 (수료증에 나와요)">
+    <input id="name" maxlength="10" placeholder="이름 또는 별명 (수료증에 나와요)">
     <button id="start" disabled>불러오는 중…</button>
-    <p class="keys">컴퓨터: 방향키·WASD 이동 / Shift 몸 낮추기<br>태블릿: 왼쪽 화면을 끌어서 이동 / 오른쪽 버튼</p>
-  </div>
-</div>
-
-<div id="quiz" class="screen hidden">
-  <div class="card">
-    <div class="qtag" id="q-tag">OX 퀴즈</div>
-    <h2 id="q-text"></h2>
-    <div class="ox"><button data-a="O" class="o">O</button><button data-a="X" class="x">X</button></div>
-    <p id="q-fb"></p>
-    <button id="q-next" class="hidden">계속 탐험하기</button>
+    <p class="keys">컴퓨터: 방향키·WASD 이동 / Shift 몸 낮추기 / Space 말하기<br>태블릿: 왼쪽 화면을 끌어서 이동 / 오른쪽 버튼<br>
+    <a href="classic/">예전 버전(안전 탐험대 클래식)</a></p>
+    <p class="osm">길·건물·학교 위치: © OpenStreetMap 기여자 (ODbL). 건물 높이는 줄였고 횡단보도·사람·소품은 수업용으로 넣었어요.</p>
   </div>
 </div>
 
 <div id="cert" class="screen hidden">
   <div class="card certcard">
     <div class="seal">🏅</div>
-    <h1>안전 탐험대 수료증</h1>
-    <p class="who"><b id="cert-name">탐험대원</b> 님은</p>
-    <p>횡단보도 · 화재 대피 · 지진 대피<br>세 가지 안전 미션을 모두 해결하여<br>이 수료증을 드립니다.</p>
+    <h1>송명 안전 탐험대 수료증</h1>
+    <p class="who"><b id="cert-name">탐험대원</b> 어린이는</p>
+    <p>인천송명초 둘레 동네에서 교통·생활·신변·재난<br>안전 미션 10개를 모두 해결하여<br>이 수료증을 드립니다.</p>
+    <p class="stars" id="cert-stars"></p>
     <p class="date" id="cert-date"></p>
-    <button id="again">처음부터 다시</button>
+    <button id="again">계속 탐험하기</button>
   </div>
 </div>
+
+<div id="loading">동네를 짓는 중… <span id="lp">0%</span></div>
 
 <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
 <script type="module" src="main.js"></script>

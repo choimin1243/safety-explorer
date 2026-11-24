@@ -1,0 +1,709 @@
+{
+"kid_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"friend_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"friend_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"guard_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"guard_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"teacher_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"teacher_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"stranger_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"stranger_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"worker_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"worker_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"manager_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"manager_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"bro_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"bro_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"keeper_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"keeper_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"medic_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"medic_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"grandma_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"grandma_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"mom_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"mom_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"student_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"student_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"officer_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"officer_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"kid2_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid2_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid3_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid3_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid_helmet_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid_helmet_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"kid_duck": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"friend_down": {
+"w": 7,
+"l": 14,
+"n": 4,
+"vox": 0.075,
+"note": "person"
+},
+"car_white": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"car_blue": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"car_red": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"car_gray": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"car_black": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"taxi": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"van": {
+"w": 17,
+"l": 40,
+"n": 18,
+"vox": 0.12,
+"note": "vehicle"
+},
+"bus": {
+"w": 21,
+"l": 92,
+"n": 26,
+"vox": 0.12,
+"note": "vehicle"
+},
+"ambulance": {
+"w": 19,
+"l": 46,
+"n": 22,
+"vox": 0.12,
+"note": "vehicle"
+},
+"tree_round": {
+"w": 23,
+"l": 23,
+"n": 44,
+"vox": 0.12,
+"note": "prop"
+},
+"tree_ginkgo": {
+"w": 19,
+"l": 19,
+"n": 48,
+"vox": 0.12,
+"note": "prop"
+},
+"ped_signal_red": {
+"w": 9,
+"l": 9,
+"n": 40,
+"vox": 0.12,
+"note": "prop"
+},
+"ped_signal_green": {
+"w": 9,
+"l": 9,
+"n": 40,
+"vox": 0.12,
+"note": "prop"
+},
+"ped_signal_off": {
+"w": 9,
+"l": 9,
+"n": 40,
+"vox": 0.12,
+"note": "prop"
+},
+"car_signal_red": {
+"w": 34,
+"l": 9,
+"n": 52,
+"vox": 0.12,
+"note": "prop"
+},
+"car_signal_yellow": {
+"w": 34,
+"l": 9,
+"n": 52,
+"vox": 0.12,
+"note": "prop"
+},
+"car_signal_green": {
+"w": 34,
+"l": 9,
+"n": 52,
+"vox": 0.12,
+"note": "prop"
+},
+"bus_shelter": {
+"w": 46,
+"l": 18,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"slide": {
+"w": 14,
+"l": 44,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"swing": {
+"w": 40,
+"l": 12,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"seesaw": {
+"w": 8,
+"l": 40,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"bench": {
+"w": 30,
+"l": 10,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"kickboard": {
+"w": 8,
+"l": 20,
+"n": 24,
+"vox": 0.12,
+"note": "prop"
+},
+"bicycle": {
+"w": 8,
+"l": 32,
+"n": 20,
+"vox": 0.12,
+"note": "prop"
+},
+"helmet": {
+"w": 9,
+"l": 9,
+"n": 6,
+"vox": 0.12,
+"note": "item"
+},
+"hydrant": {
+"w": 7,
+"l": 7,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"fence": {
+"w": 40,
+"l": 4,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"cone": {
+"w": 7,
+"l": 7,
+"n": 9,
+"vox": 0.12,
+"note": "prop"
+},
+"scaffold": {
+"w": 30,
+"l": 10,
+"n": 46,
+"vox": 0.12,
+"note": "prop"
+},
+"sign_school": {
+"w": 9,
+"l": 3,
+"n": 24,
+"vox": 0.12,
+"note": "prop"
+},
+"sign_30": {
+"w": 9,
+"l": 3,
+"n": 24,
+"vox": 0.12,
+"note": "prop"
+},
+"safe_sign": {
+"w": 14,
+"l": 3,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"desk": {
+"w": 16,
+"l": 10,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"smoke": {
+"w": 13,
+"l": 13,
+"n": 11,
+"vox": 0.12,
+"note": "fx"
+},
+"flag": {
+"w": 16,
+"l": 3,
+"n": 34,
+"vox": 0.12,
+"note": "prop"
+},
+"police_car": {
+"w": 17,
+"l": 38,
+"n": 14,
+"vox": 0.12,
+"note": "vehicle"
+},
+"school_bus": {
+"w": 19,
+"l": 70,
+"n": 24,
+"vox": 0.12,
+"note": "vehicle"
+},
+"delivery_truck": {
+"w": 19,
+"l": 50,
+"n": 24,
+"vox": 0.12,
+"note": "vehicle"
+},
+"scooter": {
+"w": 11,
+"l": 24,
+"n": 24,
+"vox": 0.12,
+"note": "vehicle"
+},
+"excavator": {
+"w": 30,
+"l": 46,
+"n": 32,
+"vox": 0.12,
+"note": "vehicle"
+},
+"street_lamp": {
+"w": 16,
+"l": 7,
+"n": 60,
+"vox": 0.12,
+"note": "prop"
+},
+"trash_bins": {
+"w": 26,
+"l": 12,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"bollard": {
+"w": 5,
+"l": 5,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"vending": {
+"w": 12,
+"l": 9,
+"n": 24,
+"vox": 0.12,
+"note": "prop"
+},
+"postbox": {
+"w": 8,
+"l": 8,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"cctv": {
+"w": 12,
+"l": 7,
+"n": 52,
+"vox": 0.12,
+"note": "prop"
+},
+"bike_rack": {
+"w": 40,
+"l": 30,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"soccer_goal": {
+"w": 56,
+"l": 20,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"hoop": {
+"w": 14,
+"l": 16,
+"n": 42,
+"vox": 0.12,
+"note": "prop"
+},
+"planter": {
+"w": 24,
+"l": 10,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"guard_booth": {
+"w": 26,
+"l": 24,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"parking_gate": {
+"w": 60,
+"l": 8,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"mirror": {
+"w": 14,
+"l": 9,
+"n": 36,
+"vox": 0.12,
+"note": "prop"
+},
+"school_gate": {
+"w": 90,
+"l": 12,
+"n": 36,
+"vox": 0.12,
+"note": "prop"
+},
+"safety_fence": {
+"w": 48,
+"l": 4,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"aed": {
+"w": 10,
+"l": 5,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"extinguisher": {
+"w": 6,
+"l": 6,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"shop_conv": {
+"w": 60,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"shop_snack": {
+"w": 60,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"dog": {
+"w": 7,
+"l": 14,
+"n": 9,
+"vox": 0.075,
+"note": "person"
+},
+"stroller": {
+"w": 10,
+"l": 16,
+"n": 16,
+"vox": 0.075,
+"note": "person"
+},
+"crosswalk_sign": {
+"w": 11,
+"l": 3,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"busstop_sign": {
+"w": 9,
+"l": 3,
+"n": 34,
+"vox": 0.12,
+"note": "prop"
+},
+"rubble": {
+"w": 9,
+"l": 9,
+"n": 3,
+"vox": 0.12,
+"note": "fx"
+},
+"firetruck": {
+"w": 23,
+"l": 48,
+"n": 24,
+"vox": 0.17,
+"note": "vehicle"
+}
+}

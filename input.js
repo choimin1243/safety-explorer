@@ -1,6 +1,6 @@
 // 키보드 · 터치 입력. 놓친 키 떼기 이벤트에 견디도록 최소한만 처리한다.
 export const keys = new Set(), pressed = new Set();
-export const touch = { x: 0, y: 0, crouch: false };
+export const touch = { x: 0, y: 0, crouch: false, act: false };
 const OPP = { KeyW: 'KeyS', KeyS: 'KeyW', KeyA: 'KeyD', KeyD: 'KeyA', ArrowUp: 'ArrowDown', ArrowDown: 'ArrowUp', ArrowLeft: 'ArrowRight', ArrowRight: 'ArrowLeft' };
 let log = [];
 const note = (s) => { log.push(s); log = log.slice(-8); };
@@ -42,6 +42,19 @@ const cb = document.getElementById('btn-crouch');
 const setC = (v) => (e) => { e.preventDefault(); touch.crouch = v; cb.classList.toggle('on', v); };
 cb.addEventListener('pointerdown', setC(true));
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) cb.addEventListener(ev, setC(false));
+const ab = document.getElementById('btn-act');
+ab.addEventListener('pointerdown', (e) => { e.preventDefault(); pressed.add('Space'); ab.classList.add('on'); });
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) ab.addEventListener(ev, () => ab.classList.remove('on'));
+// 두 손가락 오므리기 = 확대/축소
+export const pinch = { d: 0, delta: 0 };
+const tps = new Map();
+addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') tps.set(e.pointerId, [e.clientX, e.clientY]); });
+addEventListener('pointermove', (e) => {
+  if (!tps.has(e.pointerId)) return; tps.set(e.pointerId, [e.clientX, e.clientY]);
+  if (tps.size === 2) { const [a, b] = [...tps.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch.d) pinch.delta += (pinch.d - d) / 200; pinch.d = d; }
+});
+const tpEnd = (e) => { tps.delete(e.pointerId); pinch.d = 0; };
+addEventListener('pointerup', tpEnd); addEventListener('pointercancel', tpEnd);
 
 // F3: 입력 문제를 알릴 때 쓰는 작은 패널
 export function debugPanel(extra = () => '') {
