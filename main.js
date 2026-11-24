@@ -182,6 +182,8 @@ function updateCars(dt, sig) {
     // 횡단보도에 사람이 있으면 양보
     if (inRoad(player.pos.x, player.pos.z) && Math.abs(player.pos.z - c.g.position.z) < 2.2) { const gap = (player.pos.x - x) * c.dir; if (gap > 0 && gap < 7 && sig.car !== 'green') target = 0; }
     c.v += (target - c.v) * Math.min(1, dt * 3);
+    // 소방차가 뒤에서 오면 길 가장자리로 비켜 준다
+    if (c.lane === 0) { const tx = truck.g.position.x, gap = x - tx, yield_ = truck.state === 'drive' && Math.abs(truck.g.position.z + 16) < 0.5 && gap > -5 && gap < 22; c.g.position.z += ((yield_ ? -18.6 : -16) - c.g.position.z) * Math.min(1, dt * 3); }
     c.g.position.x += c.dir * c.v * dt;
     if (Math.abs(c.g.position.x) > 60) { scene.remove(c.g); cars.splice(i, 1); }
   }
@@ -226,6 +228,46 @@ const flames = [];
 for (let i = 0; i < 6; i++) { const f = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.2, 8), new THREE.MeshBasicMaterial({ color: i % 2 ? 0xff7a1a : 0xffc21a, transparent: true, opacity: 0.9 })); f.position.set((i % 3 - 1) * 0.5, 0.6, (i / 3 | 0) * 0.5 - 0.25); fireGlow.add(f); flames.push(f); }
 fireGlow.visible = false;
 solid(13.6, 15.4, 0.8, 2.4);
+
+// ---------- 픽셀 소방차 (sprite-stacking 슬라이스 24장을 3D 로 쌓음) ----------
+// 원본: assets/firetruck_slices.png (23x48 px 슬라이스 24장, 바닥이 왼쪽). 앞이 이미지 아래쪽 → 로컬 +z.
+const TRUCK_N = 24, TPX = 0.16;                        // 1 아트픽셀 = 0.16 m
+const truck = { g: new THREE.Group(), state: 'away', wp: [], v: 0, siren: null, t: 0 };
+truck.g.visible = false; scene.add(truck.g);
+new THREE.TextureLoader().load('assets/firetruck_slices.png', (tex) => {
+  tex.magFilter = tex.minFilter = THREE.NearestFilter; tex.generateMipmaps = false; tex.colorSpace = THREE.SRGBColorSpace;
+  const sw = tex.image.width / TRUCK_N, sh = tex.image.height;
+  const geo = new THREE.PlaneGeometry(sw * TPX, sh * TPX);
+  for (let i = 0; i < TRUCK_N; i++) for (let k = 0; k < 2; k++) {   // 층 사이 틈을 메우려고 한 층에 두 장
+    const t = tex.clone(); t.needsUpdate = true; t.repeat.set(1 / TRUCK_N, 1); t.offset.set(i / TRUCK_N, 0);
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: t, alphaTest: 0.5, side: THREE.DoubleSide }));
+    m.rotation.x = -Math.PI / 2; m.position.y = 0.05 + (i + k * 0.5) * TPX; truck.g.add(m);
+  }
+  const sh_ = new THREE.Mesh(new THREE.PlaneGeometry(sw * TPX * 1.05, sh * TPX * 1.02), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false }));
+  sh_.rotation.x = -Math.PI / 2; sh_.position.set(0.25, 0.04, 0.35); truck.g.add(sh_);
+});
+const sirenL = new THREE.PointLight(0xff2030, 0, 14); sirenL.position.set(0, 4.5, 2); truck.g.add(sirenL);
+function dispatchTruck() {
+  if (truck.state !== 'away') return;
+  truck.state = 'drive'; truck.g.visible = true; truck.v = 11;
+  truck.g.position.set(-58, 0, -16);                    // 동쪽으로 가는 차선
+  truck.wp = [new THREE.Vector3(34, 0, -16), new THREE.Vector3(34, 0, -4), new THREE.Vector3(34, 0, 3)];
+}
+function updateTruck(dt, time) {
+  if (truck.state === 'away') return;
+  const flash = Math.sin(time * 10) > 0;
+  sirenL.color.setHex(flash ? 0xff2030 : 0x3060ff); sirenL.intensity = truck.state === 'drive' || S.mission === 'fire' ? 40 : 0;
+  if (truck.state === 'drive') {
+    if ((truck.t -= dt) <= 0) { truck.t = 0.9; beep(960, 0.4, 'triangle', 0.05); beep(720, 0.4, 'triangle', 0.05, 0.45); }
+    const target = truck.wp[0], p = truck.g.position, d = target.clone().sub(p); d.y = 0;
+    const dist = d.length(), last = truck.wp.length === 1;
+    const v = last ? Math.min(truck.v, dist * 2 + 0.5) : truck.v;
+    if (dist < 0.2) { truck.wp.shift(); if (!truck.wp.length) { truck.state = 'parked'; solid(p.x - 1.9, p.x + 1.9, p.z - 4, p.z + 4); } return; }
+    p.addScaledVector(d.normalize(), Math.min(dist, v * dt));
+    let want = Math.atan2(d.x, d.z), dr = want - truck.g.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr));
+    truck.g.rotation.y += dr * Math.min(1, dt * 6);
+  }
+}
 
 // ---------- 건물: 지진 대피 교실 (x -30~-12, z 0~16) ----------
 const QUAKE = { x0: -30, x1: -12, z0: 0, z1: 16 };
@@ -349,7 +391,7 @@ function startMission(k) {
   S.mission = k; S.t = 0; S.phase = 'go';
   document.querySelectorAll('.m').forEach((m) => m.classList.remove('active')); $('m-' + k).classList.add('active');
   if (k === 'road') { goalRing.visible = true; say('길 건너 <b>학교</b>(초록 고리)로 가요.<br>신호등을 보고 <b>초록불</b>일 때 <b>횡단보도</b>로 건너요!', '', 5); }
-  if (k === 'fire') { say('🚨 불이야! 연기가 천장에 가득해요.<br><b>Shift(몸 낮추기)</b>를 누른 채 초록 화살표를 따라 <b>비상구</b>로!', 'warn', 5.5); S.smoke = 0; fireGlow.visible = true; $('meter').classList.remove('hidden'); $('meter-label').textContent = '연기 마심'; }
+  if (k === 'fire') { say('🚨 불이야! 연기가 천장에 가득해요.<br><b>Shift(몸 낮추기)</b>를 누른 채 초록 화살표를 따라 <b>비상구</b>로!', 'warn', 5.5); S.smoke = 0; fireGlow.visible = true; dispatchTruck(); $('meter').classList.remove('hidden'); $('meter-label').textContent = '연기 마심'; }
   if (k === 'quake') { S.phase = 'wait'; say('교실 안으로 들어가요. 곧 <b>지진 대피 훈련</b>이 시작돼요.', '', 4); }
 }
 let crossedOnGreen = false, quakeHide = 0;
@@ -480,7 +522,7 @@ function frame(dt) {
   const sig = signalState();
   updatePlayer(dt); updateCars(dt, sig);
   if (S.started) updateMission(dt, sig);
-  updateSignals(sig, time); updateFx(dt, time); updateCamera(dt);
+  updateSignals(sig, time); updateFx(dt, time); updateTruck(dt, time); updateCamera(dt);
   if (bannerT > 0 && (bannerT -= dt) <= 0) $('banner').classList.remove('show');
   renderer.render(scene, camera); endFrame(); dbg();
 }
@@ -509,6 +551,7 @@ window.G = {
   tp: (x, z) => { player.pos.set(x, 0, z); camTarget.set(x, 0, z); },
   hold: (...c) => c.forEach((k) => keys.add(k)), release: (...c) => c.forEach((k) => keys.delete(k)),
   sig: () => signalState(), setSig: (t) => { sigT = t; },
+  truck: () => ({ state: truck.state, x: +truck.g.position.x.toFixed(1), z: +truck.g.position.z.toFixed(1), kids: truck.g.children.length }),
   state: () => ({ x: +player.pos.x.toFixed(2), z: +player.pos.z.toFixed(2), crouch: player.crouch, mission: S.mission, phase: S.phase, done: { ...S.done }, smoke: Math.round(S.smoke), quiz: S.quiz, cars: cars.length, banner: $('banner').textContent }),
   quiz: (a) => { if (!S.quiz) return 'no quiz'; document.querySelector(`.ox button[data-a="${a}"]`).click(); $('q-next').click(); },
 };
