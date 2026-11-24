@@ -313,7 +313,7 @@ function placeProps() {
   label('☕ 카페', wx(23.2), 6.6, wz(19.4), { bg: '#7a4f2a', fg: '#fff', scale: 0.6 }); label('📚 영어·수학 학원', wx(23.2), 6.6, wz(22.2), { bg: '#5b8def', fg: '#fff', scale: 0.6 });
   // ---- 단지 · 공원 생활 소품 ----
   prop('outdoor_gym', 58.6, 47.6, 0, 1.6); prop('recycle_station', 35.6, 62.6, 0, 2.0); prop('recycle_station', 8.6, 45.6, Math.PI / 2, 2.0);
-  prop('apt_entrance', 30.5, 29.95, 0, 0); prop('school_door', 40.55, 16.5, -Math.PI / 2, 0);
+  prop('apt_entrance', 30.5, 29.95, 0, 0); prop('school_door', 40.55, 16.5, -Math.PI / 2, 0); prop('school_door', 42.2, 20.95, 0, 0); prop('school_door', 49.65, 19.5, Math.PI / 2, 0); prop('school_door', 52.5, 16.75, 0, 0);
   prop('parcel_locker', 51.2, 62.4, 0, 0.8); prop('apt_sign', 44.6, 62.6, 0, 0.4); prop('pavilion', 75, 47.5, 0, 2.0); prop('bench', 72.6, 45.5, Math.PI / 2, 1);
   // 단지 안 주차된 차 (같은 색끼리 묶어 그리기)
   const parked = { car_white: [], car_gray: [], car_black: [], car_blue: [], car_red: [] }, pn = Object.keys(parked);
@@ -826,6 +826,47 @@ const ROOMS = {
       { spr: 'lab_coat', x: 2.4, y: 6.2, sc: 1.5, step: 2, name: '실험복 입기', why: '옷에 약품이 튀지 않게 실험복을 입어요.' },
       { spr: 'alcohol_lamp', x: 5.0, y: 3.0, sc: 1.6, step: 3, name: '램프 뚜껑 덮어 끄기', why: '입으로 불지 말고 뚜껑을 비스듬히 덮어 꺼요.' },
       { spr: 'beaker', x: 7.0, y: 4.4, sc: 1.6, bad: true, name: '비커 냄새 맡기', why: '코를 대고 맡으면 위험해요! 손으로 살살 부채질해서 맡아요.' }] } },
+  gym: { name: '🏀 송명초 체육관', ox: -150, oy: 140, w: 11, h: 7, floor: '#d8a86a', wall: '#f4efe4', door: [52.5, 17.3], npc: ['pe_teacher', 'pe_teacher_0', 9.4, 1.6],
+    talk: [{ who: 'pe_teacher', say: '체육관에 왔구나! 신나게 뛰려면 안전 규칙부터 지키자.' },
+      { who: 'pe_teacher', ask: '더운 날 운동하다 머리가 어지럽고 속이 메스꺼우면?', choices: [
+        { t: '바로 멈추고 그늘에서 쉬며 물을 마시고 선생님께 알린다', ok: true, why: '맞아요! 열사병일 수 있어요. 시원한 곳에서 쉬어요.' },
+        { t: '친구들한테 지기 싫어서 계속 뛴다', why: '참으면 쓰러질 수 있어요. 바로 멈춰요.' },
+        { t: '혼자 화장실에 가서 참는다', why: '혼자 있다가 쓰러지면 위험해요. 꼭 어른에게 알려요.' }] }],
+    task: { mode: 'hunt', title: '체육관에서 위험한 것 찾기', items: [
+      { spr: 'ball_floor', x: 4.2, y: 4.6, sc: 2.4, name: '굴러다니는 공', why: '바닥의 공을 밟으면 발목을 다쳐요. 공 바구니에 넣어요.' },
+      { spr: 'vault_box', x: 7.6, y: 4.2, sc: 1.5, name: '매트 없는 뜀틀', why: '뜀틀 뒤에는 꼭 매트를 깔고 선생님이 계실 때만 넘어요.' },
+      { spr: 'puddle', x: 2.0, y: 2.8, sc: 1.4, name: '흘린 물', why: '젖은 바닥에서 뛰면 미끄러져요. 바로 닦아요.' }] } },
+  nurse: { name: '🩹 송명초 보건실', ox: -150, oy: 160, w: 8, h: 6, floor: '#eef2f0', wall: '#ffffff', door: [42.2, 21.6], npc: ['nurse', 'nurse_0', 5.6, 1.6],
+    talk: [{ who: 'nurse', say: '어디 다쳤니? 보건실은 아프거나 다쳤을 때 언제든 오는 곳이야.' },
+      { who: 'nurse', ask: '갑자기 코피가 나면 어떻게 할까?', choices: [
+        { t: '고개를 살짝 앞으로 숙이고 콧볼을 10분쯤 꾹 누른다', ok: true, why: '맞아요! 피가 목으로 넘어가지 않게 앞으로 숙여요.' },
+        { t: '고개를 뒤로 젖히고 하늘을 본다', why: '피가 목으로 넘어가 토할 수 있어요. 앞으로 숙여요.' },
+        { t: '휴지를 깊숙이 넣고 뛰어논다', why: '쉬면서 콧볼을 눌러 피를 멈춰요.' }] }],
+    task: { mode: 'order', title: '무릎이 까졌을 때 순서', intro: '🩹 운동장에서 넘어져 무릎이 까졌어요! 순서대로 눌러요.', items: [
+      { spr: 'sink', x: 0.6, y: 2.6, r: Math.PI / 2, sc: 1.5, step: 1, name: '흐르는 물로 씻기', why: '먼저 깨끗한 물로 흙과 모래를 씻어내요.' },
+      { spr: 'first_aid_kit', x: 3.0, y: 3.2, sc: 1.6, step: 2, name: '소독하기', why: '소독약으로 세균을 없애요. 보건 선생님께 도움을 받아요.' },
+      { spr: 'bandage', x: 4.4, y: 3.4, sc: 1.8, step: 3, name: '밴드 붙이기', why: '밴드로 상처를 덮어 보호해요.' }] } },
+  cafe: { name: '🍚 송명초 급식실', ox: -150, oy: 180, w: 11, h: 7, floor: '#e8eef2', wall: '#fffaf0', door: [50.2, 19.5], npc: ['cook', 'cook_0', 5.5, 1.3],
+    talk: [{ who: 'cook', say: '맛있는 점심 시간! 급식실에서도 지켜야 할 약속이 있어요.' },
+      { who: 'cook', ask: '나는 땅콩 알레르기가 있어요. 오늘 반찬에 땅콩이 들어 있다면?', choices: [
+        { t: '먹지 않고, 선생님과 조리사님께 미리 알린다', ok: true, why: '맞아요! 알레르기는 숨쉬기 힘들 만큼 위험할 수 있어요.' },
+        { t: '조금만 먹으면 괜찮겠지 하고 먹는다', why: '아주 조금만 먹어도 위험할 수 있어요.' },
+        { t: '친구 반찬과 몰래 바꾼다', why: '어른에게 알려야 안전하게 바꿔 줄 수 있어요.' }] }],
+    task: { mode: 'order', title: '급식 먹는 순서', intro: '🍚 점심시간! 순서대로 눌러 급식을 받아요.', items: [
+      { spr: 'sink', x: 10.4, y: 4.4, r: -Math.PI / 2, sc: 1.5, step: 1, name: '비누로 30초 손 씻기', why: '손 씻기는 식중독과 감기를 막는 첫걸음이에요.' },
+      { spr: 'tray_stack', x: 1.6, y: 1.0, sc: 1.6, step: 2, name: '줄 서서 식판 받기', why: '밀지 않고 차례대로 줄을 서요.' },
+      { spr: 'hot_soup', x: 8.8, y: 1.3, sc: 1.6, bad: true, name: '국 들고 뛰기', why: '뜨거운 국을 들고 뛰면 쏟아져 화상을 입어요. 천천히 걸어요.' },
+      { spr: 'cafe_table', x: 2.8, y: 5.6, sc: 1.6, step: 3, name: '자리에 앉아 먹기', why: '자리에 앉아 꼭꼭 씹어 먹어요. 다 먹으면 잔반 정리!' }] } },
+  acad: { name: '✏️ 송명 학원', ox: -150, oy: 200, w: 8, h: 6, floor: '#e4e0d8', wall: '#fbf7ef', door: [23.0, 22.6], npc: ['tutor', 'tutor_0', 6.6, 1.5],
+    talk: [{ who: 'tutor', say: '수업 끝! 집에 갈 때는 학원 차를 타는 학생도 있지?' },
+      { who: 'tutor', ask: '학원 차에서 내린 뒤 길을 건너려면?', choices: [
+        { t: '차가 떠난 뒤 좌우를 살피고 횡단보도로 건넌다', ok: true, why: '맞아요! 차 앞뒤는 운전자가 잘 못 봐요.' },
+        { t: '내리자마자 차 앞으로 바로 건넌다', why: '차 바로 앞은 운전석에서 안 보여요. 아주 위험해요.' },
+        { t: '안전벨트를 미리 풀고 문 앞에 서 있는다', why: '차가 완전히 멈출 때까지 벨트를 매고 앉아 있어요.' }] }],
+    task: { mode: 'hunt', title: '화재 위험 찾기', items: [
+      { spr: 'exit_sign_blocked', x: 0.3, y: 2.4, r: Math.PI / 2, sc: 1.6, name: '비상구를 막은 의자', why: '불이 나면 비상구로 나가야 해요. 비상구 앞은 늘 비워요.' },
+      { spr: 'heater', x: 7.4, y: 4.4, sc: 1.5, name: '난로 옆 종이', why: '난로 가까이 종이·옷을 두면 불이 붙어요.' },
+      { spr: 'multitap', x: 3.6, y: 0.9, sc: 1.5, name: '문어발 콘센트', why: '플러그를 많이 꽂으면 뜨거워져 불이 날 수 있어요.' }] } },
 };
 ROOMS.class.task = { mode: 'hunt', title: '교실에서 위험한 것 찾기', items: [
   { spr: 'bag_floor', x: 4.95, y: 4.0, sc: 1.4, name: '통로의 책가방', why: '통로에 둔 가방에 걸려 넘어질 수 있어요. 책상 옆 고리에 걸어요.' },
@@ -839,7 +880,8 @@ ROOMS.snack.task = { mode: 'hunt', title: '분식집에서 위험한 것 찾기'
   { spr: 'pot_handle', x: 3.5, y: 1.25, sc: 1.4, name: '밖으로 나온 냄비 손잡이', why: '손잡이에 부딪히면 뜨거운 국물이 쏟아져요. 손잡이는 안쪽으로!' },
   { spr: 'box_stack', x: 6.2, y: 4.3, sc: 1.3, name: '소화기를 가린 상자', why: '소화기 앞에 물건을 두면 불이 났을 때 못 꺼내요.' },
   { spr: 'puddle', x: 1.8, y: 1.9, sc: 1.3, name: '쏟은 국물', why: '바닥에 쏟은 국물은 미끄럽고 뜨거워요. 어른에게 알려요.' }] };
-NAMES.pharmacist = '약사 선생님'; NAMES.master = '태권도 관장님'; NAMES.scientist = '과학 선생님';
+Object.values(ROOMS).forEach((R, i) => { R.oy = i * 40; });   // 방끼리 멀리 떨어뜨려 옆 방이 안 보이게
+NAMES.pe_teacher = '체육 선생님'; NAMES.nurse = '보건 선생님'; NAMES.cook = '조리사님'; NAMES.tutor = '학원 선생님'; NAMES.pharmacist = '약사 선생님'; NAMES.master = '태권도 관장님'; NAMES.scientist = '과학 선생님';
 NAMES.clerk = '편의점 점원'; NAMES.owner = '분식집 사장님';
 const badges = new Set();
 function roomTex(id, kind, R) {
@@ -848,18 +890,19 @@ function roomTex(id, kind, R) {
     c.width = R.w * 32; c.height = R.h * 32;
     if (id === 'class') { for (let y = 0; y < c.height; y += 8) for (let x = -((y / 8) % 4) * 16; x < c.width; x += 64) { g.fillStyle = ['#c8a27a', '#bf976c', '#d1ad86', '#c49c72'][(x / 64 + y / 8 + 9) & 3 | 0]; g.fillRect(x, y, 63, 7); } }
     else if (id === 'conv') { for (let y = 0; y < c.height; y += 32) for (let x = 0; x < c.width; x += 32) { g.fillStyle = (x + y) % 64 ? '#e8eef2' : '#dde4ea'; g.fillRect(x, y, 31, 31); } }
+    else if (id === 'gym') { for (let y = 0; y < c.height; y += 8) for (let x = -((y / 8) % 3) * 21; x < c.width; x += 64) { g.fillStyle = ['#d8a86a', '#cf9f60', '#e0b274'][(x / 64 + y / 8 + 9) % 3 | 0]; g.fillRect(x, y, 63, 7); } g.strokeStyle = '#ffffff'; g.lineWidth = 3; g.strokeRect(24, 24, c.width - 48, c.height - 48); g.beginPath(); g.moveTo(c.width / 2, 24); g.lineTo(c.width / 2, c.height - 24); g.stroke(); g.beginPath(); g.arc(c.width / 2, c.height / 2, 30, 0, 7); g.stroke(); }
     else if (id === 'tkd') { g.fillStyle = '#3b6fd8'; g.fillRect(0, 0, c.width, c.height); for (let y = 0; y < c.height; y += 32) for (let x = 0; x < c.width; x += 32) { g.fillStyle = (x + y) % 64 ? '#3b6fd8' : '#d8483b'; g.fillRect(x + 1, y + 1, 30, 30); } g.strokeStyle = '#ffd23f'; g.lineWidth = 3; g.strokeRect(40, 40, c.width - 80, c.height - 80); }
     else if (id === 'apt') { for (let y = 0; y < c.height; y += 48) for (let x = 0; x < c.width; x += 48) { g.fillStyle = (x + y) % 96 ? '#d9d6cf' : '#cfcbc2'; g.fillRect(x, y, 47, 47); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x + 8, y + 20, 18, 2); } }
-    else if (id === 'pharm' || id === 'sci') { for (let y = 0; y < c.height; y += 24) for (let x = 0; x < c.width; x += 24) { g.fillStyle = (x + y) % 48 ? (id === 'sci' ? '#d9dde2' : '#eef2f0') : (id === 'sci' ? '#c8ced4' : '#dfe8e3'); g.fillRect(x, y, 23, 23); } }
+    else if (id === 'pharm' || id === 'sci' || id === 'nurse' || id === 'cafe' || id === 'acad') { for (let y = 0; y < c.height; y += 24) for (let x = 0; x < c.width; x += 24) { g.fillStyle = (x + y) % 48 ? (id === 'sci' ? '#d9dde2' : '#eef2f0') : (id === 'sci' ? '#c8ced4' : '#dfe8e3'); g.fillRect(x, y, 23, 23); } }
     else { for (let y = 0; y < c.height; y += 16) for (let x = 0; x < c.width; x += 16) { g.fillStyle = ((x + y) / 16) % 2 ? '#f2e6cf' : '#e4d2b0'; g.fillRect(x, y, 16, 16); } }
     g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(0, 0, c.width, 6);
   } else {
     const ww = kind === 'back' ? R.w : R.h; c.width = ww * 32; c.height = 48;
     g.fillStyle = R.wall; g.fillRect(0, 0, c.width, 48);
-    g.fillStyle = { class: '#9bb5a0', conv: '#2f7de1', pharm: '#2fa84f', tkd: '#d8483b', apt: '#a89880', sci: '#5b7f9e' }[id] || '#e2463b'; g.fillRect(0, 36, c.width, 12);      // 걸레받이·띠
+    g.fillStyle = { class: '#9bb5a0', conv: '#2f7de1', pharm: '#2fa84f', tkd: '#d8483b', apt: '#a89880', sci: '#5b7f9e', gym: '#2f5fb3', nurse: '#ff9fb8', cafe: '#ff9f1c', acad: '#8e5cd9' }[id] || '#e2463b'; g.fillRect(0, 36, c.width, 12);      // 걸레받이·띠
     if (kind === 'side' && id === 'tkd') { g.fillStyle = '#cfe8f5'; g.fillRect(8, 6, c.width - 16, 28); g.fillStyle = 'rgba(255,255,255,.7)'; for (let x = 20; x < c.width; x += 40) g.fillRect(x, 8, 6, 24); }   // 거울
     if (kind === 'back' && (id === 'tkd' || id === 'pharm')) { g.fillStyle = id === 'tkd' ? '#1d1a1a' : '#2fa84f'; g.font = 'bold 10px sans-serif'; g.textAlign = 'center'; g.fillText(id === 'tkd' ? '예의 · 염치 · 인내 · 극기 · 백절불굴' : '약은 약사에게 · 정해진 양만', c.width / 2, 32); }
-    if (kind === 'side' && (id === 'sci' || id === 'pharm' || id === 'apt')) for (let x = 14; x < c.width - 30; x += 50) { g.fillStyle = '#e8e2d2'; g.fillRect(x, 6, 36, 24); g.fillStyle = '#a8d8f0'; g.fillRect(x + 3, 9, 30, 18); }
+    if (kind === 'side' && ['sci', 'pharm', 'apt', 'gym', 'nurse', 'cafe', 'acad'].includes(id)) for (let x = 14; x < c.width - 30; x += 50) { g.fillStyle = '#e8e2d2'; g.fillRect(x, 6, 36, 24); g.fillStyle = '#a8d8f0'; g.fillRect(x + 3, 9, 30, 18); }
     if (kind === 'back' && id === 'sci') { const cs = ['#ff9f9f', '#ffd29f', '#fff29f', '#b8f2a8', '#a8e0f2', '#c8b8f2']; for (let i = 0; i < 18; i++) for (let j = 0; j < 4; j++) if (j === 0 ? (i === 0 || i === 17) : !(j < 3 && i > 1 && i < 12)) { g.fillStyle = cs[(i + j) % 6]; g.fillRect(c.width * 0.66 + i * 4.2, 8 + j * 5, 3.6, 4.2); } }
     if (id === 'conv' && kind === 'back') { g.fillStyle = '#ff9f1c'; g.fillRect(0, 4, c.width, 5); g.fillStyle = '#2fa84f'; g.fillRect(0, 9, c.width, 3); }
     if (kind === 'side' && id === 'class') for (let x = 10; x < c.width - 30; x += 46) {                                 // 교실 창문
@@ -924,6 +967,21 @@ function buildRooms() {
       P('blackboard', 5, 0.3, 0, 0); P('skeleton_model', 0.7, 0.8, 0, 0.5); P('sink', 9.3, 3.4, -Math.PI / 2, 0); P('bookshelf', 2.4, 0.45, 0, 0.8); P('extinguisher', 9.6, 5.6, 0, 0);
       P('lab_table', 3.2, 3.4, 0, 1.4); P('lab_table', 6.8, 3.4, 0, 1.4); P('lab_table', 3.2, 5.5, 0, 1.4); P('lab_table', 6.8, 5.5, 0, 1.4); W('wall_clock', 8.0, 0.12, 3.6);
       sprite('kid2_0', wx(R.ox + 3.2), wz(R.oy + 4.3), Math.PI); sprite('kid3_0', wx(R.ox + 6.8), wz(R.oy + 6.3), Math.PI);
+    } else if (id === 'gym') {
+      P('hoop', 0.5, 3.5, Math.PI / 2, 0); P('hoop', 10.5, 3.5, -Math.PI / 2, 0); P('gym_mat', 2.4, 0.9, 0, 0, 1.5); P('gym_mat', 4.4, 0.9, 0, 0, 1.5);
+      P('ball_cart', 7.0, 0.8, 0, 0.6); P('flag', 5.5, 0.15, 0, 0); P('bench', 9.6, 6.2, 0, 0.6, 1.2); P('bench', 1.4, 6.2, 0, 0.6, 1.2);
+      sprite('kid_0', wx(R.ox + 3.4), wz(R.oy + 3.4), 0.5); sprite('friend_0', wx(R.ox + 6.0), wz(R.oy + 2.6), -0.6);
+    } else if (id === 'nurse') {
+      P('nurse_bed', 7.2, 3.4, 0, 1.0, 1.4); P('nurse_bed', 7.2, 5.4, 0, 0, 1.4); P('med_shelf', 2.8, 0.4, 0, 0); P('height_meter', 0.6, 5.2, 0, 0.3); P('plant_pot', 4.4, 0.6, 0, 0.4);
+      P('teacher_desk', 4.6, 2.3, Math.PI, 1.0, 1.3); W('wall_clock', 6.4, 0.12, 3.6);
+    } else if (id === 'cafe') {
+      P('serving_line', 5.5, 0.6, 0, 0, 1.6); P('cafe_table', 3.0, 3.6, 0, 1.6, 1.6); P('cafe_table', 8.0, 3.6, 0, 1.6, 1.6); P('cafe_table', 8.6, 5.6, 0, 1.6, 1.6);
+      P('water_purifier', 10.5, 2.6, -Math.PI / 2, 0.4); P('trash_bins', 10.3, 6.0, -Math.PI / 2, 0.5);
+      for (const [n, x, y] of [['kid2_0', 2.0, 4.4], ['kid3_0', 3.6, 4.4], ['friend_0', 7.4, 4.4], ['kid_0', 8.8, 2.8]]) sprite(n, wx(R.ox + x), wz(R.oy + y), y > 4 ? Math.PI : 0);
+    } else if (id === 'acad') {
+      P('whiteboard', 4.0, 0.3, 0, 0); P('bookshelf', 7.0, 0.45, 0, 0.8); W('wall_clock', 1.4, 0.12, 3.6); P('plant_pot', 7.5, 5.4, 0, 0.4);
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) P('kid_desk', 2.4 + c * 1.8, 2.6 + r * 1.6, 0, 0.6, 1.4);
+      sprite('kid2_0', wx(R.ox + 2.4), wz(R.oy + 3.3), Math.PI); sprite('kid3_0', wx(R.ox + 6.0), wz(R.oy + 4.9), Math.PI);
     }
     if (R.task) {
       R.done = new Set(); R.step = 0;
@@ -1003,8 +1061,12 @@ $('zin').addEventListener('click', () => (zoom = clamp(zoom - 0.2, 0.45, 2.4)));
 function updateCamera(dt) {
   if (keys.has('Equal') || keys.has('NumpadAdd')) zoom = clamp(zoom - dt, 0.45, 2.4); if (keys.has('Minus') || keys.has('NumpadSubtract')) zoom = clamp(zoom + dt, 0.45, 2.4);
   zoom = clamp(zoom + pinch.delta, 0.45, 2.4); pinch.delta = 0;
-  const p = player.g.position; camT.lerp(p, Math.min(1, dt * 5));
-  const portrait = innerWidth < innerHeight, d = (portrait ? 1.25 : 1) * zoom;
+  const p = player.g.position, Rm = player.room && ROOMS[player.room];
+  const portrait = innerWidth < innerHeight; let d = (portrait ? 1.25 : 1) * zoom;
+  if (Rm) {   // 실내: 방 전체가 화면에 들어오게
+    const asp = innerWidth / innerHeight; d = clamp(Math.max(d, 1.2 * ((Rm.w + 1) / 10.5) * (1.25 / asp), 1.2 * ((Rm.h + 1) / 7.5) * (portrait ? 0.75 : 1)), 0.9, 3.2);
+    camT.lerp(new THREE.Vector3(wx(Rm.ox + Rm.w / 2), 0, wz(Rm.oy + Rm.h / 2) + (portrait ? 2 : 3)), Math.min(1, dt * 5));
+  } else camT.lerp(p, Math.min(1, dt * 5));
   camera.position.set(camT.x, camT.y + 21 * d, camT.z + 21 * d);
   shake = lerp(shake, quake && quake.phase === 'shake' ? 0.6 : 0, Math.min(1, dt * 4));
   if (shake > 0.01) camera.position.add(new THREE.Vector3((Math.random() - 0.5) * shake, 0, (Math.random() - 0.5) * shake));

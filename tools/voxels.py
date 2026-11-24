@@ -189,6 +189,10 @@ PEOPLE = {
     'master':   dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#1d1a1a', adult=True, shoes='#e8c8a8'),
     'kid_dobok': dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#3a2a20', shoes='#e8c8a8'),
     'scientist': dict(shirt='#eef4f8', pants='#3c4048', hair='#6a4a2a', adult=True, glasses=True),
+    'pe_teacher': dict(shirt='#2f5fb3', pants='#2f5fb3', hair='#1d1a1a', adult=True, hat='#e2463b', shoes='#f4f6f8'),
+    'nurse':    dict(shirt='#f4f6f8', pants='#ff9fb8', hair='#3a2a20', adult=True, long_hair=True),
+    'cook':     dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#3a2a20', adult=True, hat='#ffffff', mask=True),
+    'tutor':    dict(shirt='#8e5cd9', pants='#3c4048', hair='#2b1d14', adult=True, glasses=True),
 }
 BELT = {'master': '#1d1a1a', 'kid_dobok': '#ffd23f'}
 for name, kw in PEOPLE.items():
@@ -1775,6 +1779,145 @@ def check_mark():                       # 찾은 물건 위 초록 체크
     for i in range(7): v.box(4 + i, 5 + i, 1, 1, 2 + i, 3 + i, '#2fa84f', glow=True)
     return v
 save('check_mark', check_mark(), note='prop')
+
+
+# ---------------- 2차: 체육관 · 보건실 · 급식실 · 학원 ----------------
+def gym_mat():
+    v = Vox(30, 20, 4)
+    v.box(0, 29, 0, 19, 0, 3, '#2f7de1'); v.box(1, 28, 1, 18, 3, 3, '#3b8af0'); v.box(14, 15, 0, 19, 3, 3, '#1f5fb3')
+    return v
+save('gym_mat', gym_mat(), note='prop')
+
+
+def vault_box():                        # 매트 없이 놓인 뜀틀
+    v = Vox(24, 12, 16)
+    for i, z in enumerate(range(0, 12, 3)):
+        v.box(i // 2, 23 - i // 2, 0, 11, z, z + 2, '#c8955a' if i % 2 else '#b88548')
+    v.box(2, 21, 1, 10, 12, 15, '#f4f1ea'); v.box(2, 21, 1, 1, 13, 14, '#e2463b')
+    return v
+save('vault_box', vault_box(), note='prop')
+
+
+def ball_cart():
+    v = Vox(20, 14, 18)
+    v.box(0, 19, 0, 13, 2, 2, '#9aa3ad'); v.box(0, 0, 0, 13, 2, 12, '#9aa3ad'); v.box(19, 19, 0, 13, 2, 12, '#9aa3ad'); v.box(0, 19, 0, 0, 2, 12, '#9aa3ad'); v.box(0, 19, 13, 13, 2, 12, '#9aa3ad')
+    for (x, y) in [(1, 1), (18, 1), (1, 12), (18, 12)]: v.box(x, x, y, y, 0, 1, '#2b2b33')
+    for i, (x, y, z) in enumerate([(5, 4, 6), (12, 4, 6), (5, 10, 6), (13, 10, 6), (9, 7, 11), (15, 6, 11)]):
+        v.ball(x, y, z, 3.2, ['#ff9f1c', '#f4f6f8', '#e2463b', '#ff9f1c', '#2f7de1', '#ffd23f'][i])
+    return v
+save('ball_cart', ball_cart(), note='prop')
+
+
+def ball_floor():                       # 굴러다니는 공
+    v = Vox(9, 9, 9)
+    v.ball(4, 4, 4, 4, '#ff9f1c')
+    for z in range(9): v.put(4, 0 if z < 9 else 0, z, '#2b2b33')
+    for x in range(9): v.put(x, 4, 8 if 2 < x < 6 else 4, '#2b2b33')
+    return v
+save('ball_floor', ball_floor(), note='prop')
+
+
+def nurse_bed():
+    v = Vox(20, 36, 12)
+    v.box(0, 19, 0, 35, 4, 6, '#d9dde2'); v.box(1, 18, 1, 34, 7, 8, '#ffffff'); v.box(2, 17, 1, 8, 9, 10, '#cfe8f5'); v.box(1, 18, 14, 34, 9, 9, '#ff9fb8')
+    for (x, y) in [(0, 0), (19, 0), (0, 35), (19, 35)]: v.box(x, x, y, y, 0, 3, '#9aa3ad')
+    v.box(0, 19, 0, 0, 4, 11, '#c8ced4')
+    return v
+save('nurse_bed', nurse_bed(), note='prop')
+
+
+def height_meter():
+    v = Vox(10, 10, 36)
+    v.box(0, 9, 0, 9, 0, 1, '#d9dde2'); v.box(4, 5, 0, 1, 0, 35, '#f4f6f8')
+    for z in range(4, 36, 4): v.put(4, 2, z, '#e2463b')
+    v.box(3, 6, 1, 5, 26, 26, '#5b626b')
+    return v
+save('height_meter', height_meter(), note='prop')
+
+
+def first_aid_kit():                    # 구급상자(소독약)
+    v = Vox(14, 10, 10)
+    v.box(0, 13, 0, 9, 0, 7, '#ffffff'); v.box(0, 13, 0, 9, 8, 8, '#e2463b'); v.box(5, 8, 9, 9, 2, 6, '#e2463b'); v.box(4, 9, 9, 9, 3, 5, '#e2463b')
+    v.box(10, 12, 3, 5, 9, 9, '#c8653a')
+    return v
+save('first_aid_kit', first_aid_kit(), note='prop')
+
+
+def bandage():                          # 밴드 상자
+    v = Vox(10, 8, 6)
+    v.box(0, 9, 0, 7, 0, 4, '#ffd23f'); v.box(1, 8, 2, 5, 5, 5, '#f2c8a0'); v.box(4, 5, 2, 5, 5, 5, '#e8b090')
+    return v
+save('bandage', bandage(), note='prop')
+
+
+def cafe_table():                       # 급식실 긴 식탁 + 식판
+    v = Vox(44, 16, 12)
+    v.box(0, 43, 0, 15, 8, 9, '#e8eef2'); v.box(2, 3, 2, 13, 0, 7, '#9aa3ad'); v.box(40, 41, 2, 13, 0, 7, '#9aa3ad')
+    for x in (3, 15, 27):
+        for y in (1, 9):
+            v.box(x, x + 9, y, y + 5, 10, 10, '#c8ced4'); v.box(x + 1, x + 3, y + 1, y + 2, 11, 11, '#ffffff'); v.box(x + 5, x + 8, y + 1, y + 2, 11, 11, '#e2463b'); v.box(x + 2, x + 7, y + 4, y + 4, 11, 11, '#2fa84f')
+    return v
+save('cafe_table', cafe_table(), note='prop')
+
+
+def serving_line():                     # 배식대
+    v = Vox(50, 14, 16)
+    v.box(0, 49, 0, 13, 0, 9, '#c8ced4'); v.box(0, 49, 0, 13, 10, 10, '#9aa3ad'); v.box(0, 49, 0, 0, 10, 15, '#cfe8f5', glow=True)
+    for i, c in enumerate(['#f4f1ea', '#e2463b', '#2fa84f', '#ff9f1c', '#8a5a3a']):
+        x = 3 + i * 9; v.box(x, x + 6, 3, 10, 11, 11, c)
+    return v
+save('serving_line', serving_line(), note='prop')
+
+
+def tray_stack():
+    v = Vox(14, 10, 14)
+    v.box(0, 13, 0, 9, 0, 5, '#9aa3ad')
+    for z in range(6, 14): v.box(1, 12, 1, 8, z, z, '#c8ced4' if z % 2 else '#d9dde2')
+    return v
+save('tray_stack', tray_stack(), note='prop')
+
+
+def hot_soup():                         # 뜨거운 국통(김이 남)
+    v = Vox(14, 14, 20)
+    v.cyl(7, 7, 6, 0, 9, '#c8ced4'); v.cyl(7, 7, 5, 9, 9, '#c8653a'); v.box(0, 1, 6, 8, 6, 7, '#5b626b'); v.box(12, 13, 6, 8, 6, 7, '#5b626b')
+    for z in range(11, 20, 2): v.put(5 + (z % 4), 7, z, '#f4f6f8'); v.put(9 - (z % 3), 5, z + 1 if z < 19 else z, '#f4f6f8')
+    return v
+save('hot_soup', hot_soup(), note='prop')
+
+
+def whiteboard():
+    v = Vox(50, 4, 26)
+    v.box(0, 49, 0, 3, 4, 25, '#c8ced4'); v.box(1, 48, 3, 3, 5, 24, '#ffffff'); v.box(20, 23, 1, 2, 0, 4, '#9aa3ad')
+    for i, x in enumerate(range(5, 40, 9)): v.box(x, x + 6, 3, 3, 18 - i % 2 * 2, 18 - i % 2 * 2, '#2f7de1')
+    v.box(5, 30, 3, 3, 10, 10, '#e2463b'); v.box(5, 22, 3, 3, 13, 13, '#2b2b33')
+    return v
+save('whiteboard', whiteboard(), note='prop')
+
+
+def heater():                           # 난로 옆 종이 더미
+    v = Vox(20, 12, 18)
+    v.box(0, 9, 2, 9, 0, 15, '#e2463b'); v.box(1, 8, 9, 9, 3, 12, '#ff6b2c', glow=True); v.box(1, 8, 9, 9, 5, 10, '#ffd23f', glow=True)
+    v.box(12, 19, 3, 10, 0, 5, '#f4f1ea'); v.box(13, 18, 4, 9, 6, 6, '#e8e2d2')
+    return v
+save('heater', heater(), note='prop')
+
+
+def exit_sign_blocked():                # 비상구 문 앞에 쌓인 의자
+    v = Vox(24, 12, 34)
+    v.box(0, 23, 0, 3, 0, 33, '#d9dde2'); v.box(4, 19, 3, 3, 0, 26, '#7a8a9a')
+    v.box(5, 18, 3, 3, 28, 32, '#2fa84f', glow=True); v.box(7, 9, 3, 3, 29, 31, '#ffffff', glow=True)
+    for i, z in enumerate((0, 7, 14)):
+        x = 6 + i; v.box(x, x + 9, 6, 11, z + 5, z + 6, '#2f7de1'); v.box(x, x, 6, 6, z, z + 5, '#5b626b'); v.box(x + 9, x + 9, 11, 11, z, z + 5, '#5b626b'); v.box(x, x + 9, 11, 11, z + 6, z + 10, '#2f7de1')
+    return v
+save('exit_sign_blocked', exit_sign_blocked(), note='prop')
+
+
+def kid_desk():                         # 학원 작은 책상
+    v = Vox(16, 12, 10)
+    v.box(0, 15, 0, 11, 8, 9, '#f4f1ea'); v.box(1, 2, 1, 2, 0, 7, '#9aa3ad'); v.box(13, 14, 1, 2, 0, 7, '#9aa3ad'); v.box(1, 2, 9, 10, 0, 7, '#9aa3ad'); v.box(13, 14, 9, 10, 0, 7, '#9aa3ad')
+    v.box(4, 10, 3, 8, 10, 10, '#ffffff'); v.box(11, 11, 3, 8, 10, 10, '#e2463b')
+    return v
+save('kid_desk', kid_desk(), note='prop')
 
 
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다

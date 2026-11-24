@@ -279,6 +279,62 @@
 "vox": 0.075,
 "note": "person"
 },
+"pe_teacher_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"pe_teacher_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"nurse_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"nurse_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"cook_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"cook_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"tutor_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"tutor_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
 "kid_helmet_0": {
 "w": 13,
 "l": 11,
@@ -1356,6 +1412,118 @@
 "w": 12,
 "l": 3,
 "n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"gym_mat": {
+"w": 30,
+"l": 20,
+"n": 4,
+"vox": 0.12,
+"note": "prop"
+},
+"vault_box": {
+"w": 24,
+"l": 12,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"ball_cart": {
+"w": 20,
+"l": 14,
+"n": 18,
+"vox": 0.12,
+"note": "prop"
+},
+"ball_floor": {
+"w": 9,
+"l": 9,
+"n": 9,
+"vox": 0.12,
+"note": "prop"
+},
+"nurse_bed": {
+"w": 20,
+"l": 36,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"height_meter": {
+"w": 10,
+"l": 10,
+"n": 36,
+"vox": 0.12,
+"note": "prop"
+},
+"first_aid_kit": {
+"w": 14,
+"l": 10,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"bandage": {
+"w": 10,
+"l": 8,
+"n": 6,
+"vox": 0.12,
+"note": "prop"
+},
+"cafe_table": {
+"w": 44,
+"l": 16,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"serving_line": {
+"w": 50,
+"l": 14,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"tray_stack": {
+"w": 14,
+"l": 10,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"hot_soup": {
+"w": 14,
+"l": 14,
+"n": 20,
+"vox": 0.12,
+"note": "prop"
+},
+"whiteboard": {
+"w": 50,
+"l": 4,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"heater": {
+"w": 20,
+"l": 12,
+"n": 18,
+"vox": 0.12,
+"note": "prop"
+},
+"exit_sign_blocked": {
+"w": 24,
+"l": 12,
+"n": 34,
+"vox": 0.12,
+"note": "prop"
+},
+"kid_desk": {
+"w": 16,
+"l": 12,
+"n": 10,
 "vox": 0.12,
 "note": "prop"
 },
