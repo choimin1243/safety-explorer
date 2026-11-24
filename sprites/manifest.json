@@ -699,6 +699,260 @@
 "vox": 0.12,
 "note": "fx"
 },
+"bld_songmyeong": {
+"w": 72,
+"l": 80,
+"n": 28,
+"vox": 0.5,
+"note": "world",
+"bx": 41,
+"by": 11,
+"tw": 9,
+"th": 10
+},
+"bld_songmyeong_gym": {
+"w": 24,
+"l": 48,
+"n": 21,
+"vox": 0.5,
+"note": "world",
+"bx": 51,
+"by": 11,
+"tw": 3,
+"th": 6
+},
+"bld_cheomdan": {
+"w": 88,
+"l": 96,
+"n": 28,
+"vox": 0.5,
+"note": "world",
+"bx": 43,
+"by": 43,
+"tw": 11,
+"th": 12
+},
+"bld_neunghuh": {
+"w": 96,
+"l": 32,
+"n": 28,
+"vox": 0.5,
+"note": "world",
+"bx": 72,
+"by": 13,
+"tw": 12,
+"th": 4
+},
+"stage": {
+"w": 48,
+"l": 24,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"bleachers": {
+"w": 80,
+"l": 20,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"flagpoles": {
+"w": 30,
+"l": 8,
+"n": 72,
+"vox": 0.12,
+"note": "prop"
+},
+"pullup_bars": {
+"w": 40,
+"l": 6,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"jungle_gym": {
+"w": 30,
+"l": 30,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"garden": {
+"w": 40,
+"l": 30,
+"n": 10,
+"vox": 0.12,
+"note": "prop"
+},
+"pavilion": {
+"w": 36,
+"l": 36,
+"n": 40,
+"vox": 0.12,
+"note": "prop"
+},
+"statue": {
+"w": 16,
+"l": 16,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"track_marker": {
+"w": 6,
+"l": 6,
+"n": 8,
+"vox": 0.12,
+"note": "prop"
+},
+"shoe_rack": {
+"w": 30,
+"l": 8,
+"n": 18,
+"vox": 0.12,
+"note": "prop"
+},
+"shop_pharmacy": {
+"w": 48,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"shop_taekwondo": {
+"w": 48,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"shop_cafe": {
+"w": 48,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"shop_academy": {
+"w": 48,
+"l": 10,
+"n": 40,
+"vox": 0.12,
+"note": "facade"
+},
+"outdoor_gym": {
+"w": 40,
+"l": 20,
+"n": 24,
+"vox": 0.12,
+"note": "prop"
+},
+"recycle_station": {
+"w": 46,
+"l": 16,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"apt_sign": {
+"w": 16,
+"l": 6,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"parcel_locker": {
+"w": 24,
+"l": 8,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"yellow_carpet": {
+"w": 24,
+"l": 24,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"blackboard": {
+"w": 60,
+"l": 4,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
+"locker": {
+"w": 40,
+"l": 10,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"teacher_desk": {
+"w": 28,
+"l": 14,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"tv": {
+"w": 30,
+"l": 4,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"shelf_snack": {
+"w": 40,
+"l": 10,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"shelf_drink": {
+"w": 40,
+"l": 10,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"fridge": {
+"w": 30,
+"l": 12,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"counter": {
+"w": 34,
+"l": 14,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"stove": {
+"w": 30,
+"l": 14,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"table": {
+"w": 24,
+"l": 16,
+"n": 12,
+"vox": 0.12,
+"note": "prop"
+},
+"stool": {
+"w": 6,
+"l": 6,
+"n": 7,
+"vox": 0.12,
+"note": "prop"
+},
 "firetruck": {
 "w": 23,
 "l": 48,

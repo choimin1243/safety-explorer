@@ -76,7 +76,7 @@ body.touch #hint { display: none; }
   #panel { font-size: 11px; max-width: 170px; padding: 6px 8px; }
   #minimap { width: 120px; height: 93px; }
   #zoom { top: 112px; }
-  #banner { top: auto; bottom: 130px; max-width: calc(100% - 24px); font-size: 15px; }
+  #banner { top: auto; bottom: 160px; max-width: calc(100% - 24px); font-size: 15px; }
   #meter { top: auto; bottom: 196px; }
   #dtext { font-size: 16px; }
   #target { bottom: 118px; }

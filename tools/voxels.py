@@ -864,6 +864,406 @@ def rubble():                                                   # 지진 때 떨
 save('rubble', rubble(), note='fx')
 
 
+# ---------------- 3차: 학교 건물을 실제 지도 발자국으로 (1칸 = 8복셀) ----------------
+GRIDD = json.load(open(os.path.join(os.path.dirname(__file__), '..', 'data', 'songmyeong_grid.json')))
+
+
+def footprint(chars=None, rect=None):
+    cells = set()
+    if rect:
+        x0, x1, y0, y1 = rect
+        cells = {(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)}
+    else:
+        for y in range(GRIDD['H']):
+            for x in range(GRIDD['W']):
+                if GRIDD['bldg'][y][x] in chars: cells.add((x, y))
+    xs = [c[0] for c in cells]; ys = [c[1] for c in cells]
+    return cells, min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+
+
+def school_building(cells, bx, by, tw, th, *, floors=4, wall='#f2e3c4', band='#c98f5a', accent='#2f7de1', entrance='S', gym=False, name_board=True):
+    K = 8
+    W_, L_ = tw * K, th * K
+    FH = 6
+    Hgt = floors * FH + (8 if gym else 3)
+    v = Vox(W_, L_, Hgt + 1)
+    inside = np.zeros((L_, W_), bool)
+    for (x, y) in cells:
+        inside[(y - by) * K:(y - by + 1) * K, (x - bx) * K:(x - bx + 1) * K] = True
+    edge = inside & ~(np.roll(inside, 1, 0) & np.roll(inside, -1, 0) & np.roll(inside, 1, 1) & np.roll(inside, -1, 1))
+    edge[0, :] |= inside[0, :]; edge[-1, :] |= inside[-1, :]; edge[:, 0] |= inside[:, 0]; edge[:, -1] |= inside[:, -1]
+    top = floors * FH
+    for y in range(L_):
+        for x in range(W_):
+            if not inside[y, x]: continue
+            h = top
+            if gym:                                   # 체육관: 둥근 지붕
+                cx = (W_ - 1) / 2; d = abs(x - cx) / (W_ / 2); h = top + int(8 * (1 - d * d))
+            for z in range(h):
+                if edge[y, x]:
+                    fz = z % FH
+                    along = x if (y == 0 or y == L_ - 1 or not inside[max(0, y - 1), x] or not inside[min(L_ - 1, y + 1), x]) else y
+                    if z < top and fz == 0: col = band
+                    elif z < top and 2 <= fz <= 4 and along % 4 in (1, 2) and not gym: col = '#8fc3e0' if fz != 4 else '#cfe8f5'
+                    elif gym and top - 6 <= z < top and along % 3 != 0: col = '#9fd0ea'
+                    else: col = wall
+                    v.put(x, y, z, col)
+                else:
+                    if z >= h - 1: v.put(x, y, z, '#a7b3a2' if not gym else '#6f8fb0')
+            if edge[y, x] and not gym:
+                v.put(x, y, top, '#d0743c'); v.put(x, y, top + 1, '#d0743c')     # 옥상 난간
+    if not gym:
+        # 옥상: 물탱크, 태양광 판, 실외기
+        cy, cx = np.argwhere(inside).mean(0).astype(int)
+        v.box(cx - 3, cx + 2, cy - 3, cy + 2, top, top + 4, '#dfe6ea'); v.box(cx - 3, cx + 2, cy - 3, cy + 2, top + 5, top + 5, '#2f7de1')
+        ys_, xs_ = np.where(inside)
+        for k in range(0, 18, 3):
+            x0 = xs_.min() + 4 + k
+            if x0 + 2 < xs_.max(): v.box(x0, x0 + 1, ys_.min() + 3, ys_.min() + 9, top, top + 1, '#1f3a6b')
+        for k in range(3):
+            x0 = xs_.max() - 6 - k * 4
+            v.box(x0, x0 + 2, ys_.max() - 5, ys_.max() - 3, top, top + 2, '#c8ced4')
+    # 현관 (남쪽 가운데): 유리문, 차양, 시계, 학교 이름판
+    if entrance == 'S':
+        rows = np.where(inside.any(1))[0]; yb = rows.max()
+        xs_ = np.where(inside[yb])[0]; cx = int(xs_.mean())
+        v.box(cx - 4, cx + 3, yb, yb, 0, 4, '#4a7fa8'); v.box(cx - 1, cx, yb, yb, 0, 4, '#2b3440')
+        if yb + 3 < L_: v.box(cx - 6, cx + 5, yb + 1, min(L_ - 1, yb + 3), 5, 5, '#c98f5a')
+        if not gym:
+            for x in range(W_):
+                for z in range(Hgt):
+                    d = (x - cx) ** 2 + (z - (top - 4)) ** 2
+                    if d <= 6.5: v.put(x, yb, z, '#ffffff' if d <= 4 else '#2b3440')
+            v.put(cx, yb, top - 4, '#2b3440'); v.put(cx, yb, top - 3, '#2b3440'); v.put(cx + 1, yb, top - 4, '#2b3440')
+            if name_board:
+                x0 = max(0, cx - 16); v.box(x0, x0 + 9, yb, yb, top - 5, top - 2, '#2f5d3a')
+                for xx in range(x0 + 1, x0 + 9, 2): v.box(xx, xx, yb, yb, top - 4, top - 3, '#ffffff')
+            v.box(cx - 6, cx + 5, yb, yb, top + 1, top + 2, accent)
+    return v
+
+
+for nm, chars, rect, kw in (
+    ('bld_songmyeong', 'b', None, dict(wall='#f2e3c4', band='#c98f5a', accent='#2f7de1')),
+    ('bld_songmyeong_gym', 'c', None, dict(wall='#e8d6b0', band='#a87a45', gym=True, floors=2, name_board=False)),
+    ('bld_cheomdan', '\x92', None, dict(wall='#eef1f4', band='#5b8def', accent='#ff9f1c')),
+    ('bld_neunghuh', None, (72, 83, 13, 16), dict(wall='#f1e6f5', band='#9b6bc8', accent='#7c3aed')),
+):
+    cells, bx, by, tw, th = footprint(chars, rect)
+    save(nm, school_building(cells, bx, by, tw, th, **kw), vox=0.5, note='world')
+    MANIFEST[nm].update(bx=bx, by=by, tw=tw, th=th)
+
+
+# ---------------- 운동장 · 학교 소품 ----------------
+def stage():                                                    # 구령대
+    v = Vox(48, 24, 30)
+    v.box(0, 47, 4, 23, 0, 7, '#d8c3a0'); v.box(0, 47, 4, 23, 8, 8, '#a87a45')
+    for k in range(4): v.box(14 + 0, 33, 20 + k if False else 23 - k, 23 - k, 0, 7 - 2 * k, '#c8b08a')
+    for x in (1, 46):
+        v.box(x, x, 5, 5, 9, 26, '#9aa3ad'); v.box(x, x, 22, 22, 9, 26, '#9aa3ad')
+    v.box(0, 47, 2, 23, 27, 28, '#2f7de1'); v.box(2, 45, 3, 22, 29, 29, '#5b9df0')
+    v.box(20, 27, 6, 9, 9, 14, '#8a6a42')                       # 단상
+    return v
+
+
+save('stage', stage(), note='prop')
+
+
+def bleachers():                                                # 스탠드
+    v = Vox(80, 20, 14)
+    for k in range(5):
+        v.box(0, 79, k * 4, 19, 0, 2 + k * 3 - 1 if k else 1, ['#d9d2c3', '#2f7de1', '#2fa84f', '#ff9f1c', '#e2463b'][k])
+    return v
+
+
+save('bleachers', bleachers(), note='prop')
+
+
+def flagpoles():
+    v = Vox(30, 8, 72)
+    for i, (x, col) in enumerate(((5, '#ffffff'), (15, '#2f7de1'), (25, '#2fa84f'))):
+        v.box(x, x + 1, 3, 4, 0, 70 if i == 0 else 62, '#c8ced4')
+        top = 70 if i == 0 else 62
+        v.box(x + 2, x + 13 if x < 25 else x + 4, 3, 3, top - 9, top - 2, col)
+        if i == 0: v.ball(x + 7, 3, top - 5, 2, '#e2463b', rz=2); v.box(x + 3, x + 4, 3, 3, top - 8, top - 7, '#2b2b33')
+    v.box(0, 29, 0, 7, 0, 1, '#9aa3ad')
+    return v
+
+
+save('flagpoles', flagpoles(), note='prop')
+
+
+def pullup_bars():                                              # 철봉
+    v = Vox(40, 6, 26)
+    for x, h in ((0, 24), (13, 24), (26, 18), (39, 14)):
+        v.box(x, x, 2, 3, 0, h, '#e2463b')
+    v.box(0, 13, 2, 3, 23, 23, '#c8ced4'); v.box(13, 26, 2, 3, 17, 17, '#c8ced4'); v.box(26, 39, 2, 3, 13, 13, '#c8ced4')
+    return v
+
+
+save('pullup_bars', pullup_bars(), note='prop')
+
+
+def jungle_gym():
+    v = Vox(30, 30, 30)
+    for i in range(0, 30, 7):
+        for j in range(0, 30, 7):
+            v.box(i, i + 1, j, j + 1, 0, 29, ['#e2463b', '#2f7de1', '#ffd23f', '#2fa84f', '#ff9f1c'][(i + j) // 7 % 5])
+    for z in (9, 19, 28):
+        for i in range(0, 30, 7): v.box(i, i + 1, 0, 29, z, z, '#ffd23f'); v.box(0, 29, i, i + 1, z, z, '#2f7de1')
+    return v
+
+
+save('jungle_gym', jungle_gym(), note='prop')
+
+
+def garden():                                                   # 학교 텃밭
+    v = Vox(40, 30, 10)
+    for k in range(3):
+        y0 = 1 + k * 10
+        v.box(0, 39, y0, y0 + 7, 0, 3, '#8a5a2b'); v.box(1, 38, y0 + 1, y0 + 6, 4, 4, '#5a3a20')
+        for x in range(3, 38, 4):
+            v.box(x, x + 1, y0 + 2, y0 + 5, 5, 6 + (x % 3), ['#3fae5a', '#62b356', '#e2463b'][k] if (x // 4) % 3 == 0 else '#3fae5a')
+    v.box(1, 6, 0, 0, 0, 8, '#ffffff'); v.box(2, 5, 0, 0, 5, 7, '#2fa84f')
+    return v
+
+
+save('garden', garden(), note='prop')
+
+
+def pavilion():                                                 # 정자
+    v = Vox(36, 36, 40)
+    v.box(2, 33, 2, 33, 0, 4, '#b98b5a')
+    for x in (4, 31):
+        for y in (4, 31): v.box(x, x + 1, y, y + 1, 5, 26, '#8a3a2a')
+    for k in range(10):
+        v.box(0 + k * 2, 35 - k * 2, 0 + k * 2, 35 - k * 2, 27 + k, 27 + k, '#4a5a4a' if k % 2 else '#3a4a3a')
+    v.box(0, 35, 0, 35, 26, 26, '#c8312b')
+    return v
+
+
+save('pavilion', pavilion(), note='prop')
+
+
+def statue():                                                   # 책 읽는 소녀상
+    v = Vox(16, 16, 30)
+    v.box(1, 14, 1, 14, 0, 8, '#c8c2b8'); v.box(2, 13, 2, 13, 9, 9, '#a8a29a')
+    v.box(5, 10, 5, 10, 10, 15, '#7a8a7a'); v.box(6, 9, 6, 9, 16, 21, '#7a8a7a'); v.ball(7.5, 7.5, 24, 2.6, '#7a8a7a')
+    v.box(5, 10, 10, 11, 18, 19, '#ffffff')                       # 책
+    return v
+
+
+save('statue', statue(), note='prop')
+
+
+def track_marker():
+    v = Vox(6, 6, 8)
+    v.cyl(3, 3, 2, 0, 7, '#ffffff'); v.box(1, 5, 1, 5, 7, 7, '#e2463b')
+    return v
+
+
+save('track_marker', track_marker(), note='prop')
+
+
+def shoe_rack():
+    v = Vox(30, 8, 18)
+    v.box(0, 29, 0, 7, 0, 17, '#c8955a')
+    for z in (4, 9, 14):
+        v.box(1, 28, 2, 7, z, z + 3, '#8a6a42')
+        for x in range(2, 28, 4): v.box(x, x + 2, 5, 7, z, z + 1, ['#ffffff', '#2f7de1', '#e2463b', '#ffd23f'][x % 4])
+    return v
+
+
+save('shoe_rack', shoe_rack(), note='prop')
+
+
+# ---------------- 동네: 상가 앞면 더, 주차, 운동기구 ----------------
+def shop2(wall, sign_col, glass='#bfe6fb', mark=None):
+    v = Vox(48, 10, 40)
+    v.box(0, 47, 0, 9, 0, 33, wall)
+    v.box(2, 45, 9, 9, 2, 21, glass, glow=True); v.box(19, 28, 9, 9, 2, 21, '#8fc9e8', glow=True)
+    v.box(0, 47, 9, 9, 24, 31, sign_col, glow=True)
+    if mark == 'cross':
+        v.box(4, 10, 9, 9, 25, 30, '#ffffff', glow=True); v.box(6, 8, 9, 9, 25, 30, '#2fa84f', glow=True); v.box(4, 10, 9, 9, 27, 28, '#2fa84f', glow=True)
+    if mark == 'belt':
+        v.box(4, 12, 9, 9, 27, 28, '#2b2b33', glow=True)
+    if mark == 'cup':
+        v.box(4, 9, 9, 9, 25, 29, '#ffffff', glow=True); v.box(10, 10, 9, 9, 26, 28, '#ffffff', glow=True)
+    return v
+
+
+save('shop_pharmacy', shop2('#eef1f4', '#2fa84f', mark='cross'), note='facade')
+save('shop_taekwondo', shop2('#f4e8cc', '#e2463b', mark='belt'), note='facade')
+save('shop_cafe', shop2('#e8d6c0', '#7a4f2a', mark='cup'), note='facade')
+save('shop_academy', shop2('#eef1f4', '#5b8def'), note='facade')
+
+
+def outdoor_gym():
+    v = Vox(40, 20, 24)
+    v.box(0, 39, 0, 19, 0, 0, '#3fae5a')
+    v.box(3, 4, 8, 9, 1, 20, '#ffd23f'); v.box(3, 12, 8, 9, 20, 21, '#ffd23f'); v.wheel(10, 12, 9, 12, 5, tire='#2f7de1', hub='#ffd23f')
+    v.box(22, 23, 4, 5, 1, 16, '#ffd23f'); v.box(32, 33, 4, 5, 1, 16, '#ffd23f'); v.box(22, 33, 4, 5, 16, 17, '#2f7de1')
+    v.box(25, 30, 10, 16, 4, 5, '#2f7de1'); v.box(27, 28, 13, 14, 1, 3, '#ffd23f')
+    return v
+
+
+save('outdoor_gym', outdoor_gym(), note='prop')
+
+
+def recycle_station():                                          # 아파트 분리수거장
+    v = Vox(46, 16, 26)
+    v.box(0, 45, 0, 15, 24, 25, '#2fa84f'); v.box(0, 1, 0, 1, 0, 23, '#9aa3ad'); v.box(44, 45, 0, 1, 0, 23, '#9aa3ad')
+    v.box(0, 1, 14, 15, 0, 23, '#9aa3ad'); v.box(44, 45, 14, 15, 0, 23, '#9aa3ad')
+    for i, col in enumerate(('#2f7de1', '#ffd23f', '#2fa84f', '#9aa3ad', '#e2463b')):
+        x0 = 3 + i * 8; v.box(x0, x0 + 6, 3, 12, 0, 12, col); v.box(x0 + 1, x0 + 5, 12, 12, 9, 10, '#ffffff')
+    return v
+
+
+save('recycle_station', recycle_station(), note='prop')
+
+
+def apt_sign(num_col='#2f7de1'):
+    v = Vox(16, 6, 22)
+    v.box(2, 13, 2, 3, 0, 21, '#f4f1ea'); v.box(3, 12, 4, 4, 12, 19, num_col); v.box(5, 10, 4, 4, 14, 17, '#ffffff')
+    return v
+
+
+save('apt_sign', apt_sign(), note='prop')
+
+
+def parcel_locker():
+    v = Vox(24, 8, 22)
+    v.box(0, 23, 0, 7, 0, 21, '#5b8def')
+    for x in range(1, 23, 5):
+        for z in range(2, 20, 6): v.box(x, x + 3, 7, 7, z, z + 4, '#d9e6f5')
+    return v
+
+
+save('parcel_locker', parcel_locker(), note='prop')
+
+
+def yellow_carpet():                                            # 옐로카펫 (횡단보도 대기 공간 노란 바닥·벽)
+    v = Vox(24, 24, 22)
+    for x in range(24):
+        for y in range(24):
+            if x + y <= 24: v.put(x, y, 0, '#ffd23f')
+    v.box(0, 0, 0, 23, 1, 20, '#ffd23f'); v.box(0, 23, 0, 0, 1, 20, '#ffd23f')
+    v.box(0, 0, 4, 19, 8, 12, '#ffffff', glow=True); v.box(4, 19, 0, 0, 8, 12, '#ffffff', glow=True)
+    return v
+
+
+save('yellow_carpet', yellow_carpet(), note='prop')
+
+
+# ---------------- 건물 안 (교실 · 편의점 · 분식집) ----------------
+def blackboard():
+    v = Vox(60, 4, 30)
+    v.box(0, 59, 0, 3, 8, 27, '#8a6a42'); v.box(2, 57, 3, 3, 10, 25, '#2f5d3a')
+    for x in range(8, 50, 6): v.box(x, x + 3, 3, 3, 20, 20, '#f4f6f8')
+    v.box(0, 59, 0, 3, 7, 7, '#c8955a')
+    return v
+
+
+save('blackboard', blackboard(), note='prop')
+
+
+def locker():
+    v = Vox(40, 10, 22)
+    v.box(0, 39, 0, 9, 0, 21, '#c8955a')
+    for x in range(1, 39, 5):
+        for z in (2, 12): v.box(x, x + 3, 9, 9, z, z + 7, '#e8c08a'); v.put(x + 2, 9, z + 4, '#8a6a42')
+    return v
+
+
+save('locker', locker(), note='prop')
+
+
+def teacher_desk():
+    v = Vox(28, 14, 12)
+    v.box(0, 27, 0, 13, 9, 10, '#a87a45'); v.box(0, 27, 0, 1, 0, 8, '#8a6a42'); v.box(0, 1, 0, 13, 0, 8, '#8a6a42'); v.box(26, 27, 0, 13, 0, 8, '#8a6a42')
+    v.box(18, 24, 4, 9, 11, 11, '#2b2b33'); v.box(18, 24, 3, 3, 11, 15, '#2b2b33'); v.box(19, 23, 3, 3, 12, 14, '#5bc0eb', glow=True)
+    return v
+
+
+save('teacher_desk', teacher_desk(), note='prop')
+
+
+def tv():
+    v = Vox(30, 4, 22)
+    v.box(0, 29, 0, 3, 4, 21, '#2b2b33'); v.box(1, 28, 3, 3, 5, 20, '#5b9df0', glow=True); v.box(13, 16, 1, 2, 0, 3, '#5b626b')
+    return v
+
+
+save('tv', tv(), note='prop')
+
+
+def shelf(cols):
+    v = Vox(40, 10, 22)
+    v.box(0, 39, 0, 9, 0, 0, '#9aa3ad'); v.box(0, 39, 0, 1, 0, 21, '#c8ced4')
+    for z in (1, 7, 13, 19):
+        v.box(0, 39, 0, 9, z, z, '#9aa3ad')
+        if z < 19:
+            for x in range(1, 39, 3): v.box(x, x + 1, 3, 8, z + 1, z + 3 + (x % 2), cols[(x // 3 + z) % len(cols)])
+    return v
+
+
+save('shelf_snack', shelf(['#e2463b', '#ffd23f', '#2f7de1', '#ff9f1c']), note='prop')
+save('shelf_drink', shelf(['#5bc0eb', '#2fa84f', '#ffffff', '#ff6b8b']), note='prop')
+
+
+def fridge():
+    v = Vox(30, 12, 26)
+    v.box(0, 29, 0, 11, 0, 25, '#d9dde2'); v.box(1, 28, 11, 11, 2, 23, '#cfe8f5', glow=True)
+    for z in (6, 12, 18):
+        for x in range(2, 28, 3): v.box(x, x + 1, 9, 10, z, z + 3, ['#2fa84f', '#e2463b', '#ffd23f', '#5bc0eb'][x % 4])
+    return v
+
+
+save('fridge', fridge(), note='prop')
+
+
+def counter():
+    v = Vox(34, 14, 14)
+    v.box(0, 33, 0, 13, 0, 9, '#2f7de1'); v.box(0, 33, 0, 13, 10, 10, '#eef1f4')
+    v.box(4, 9, 4, 9, 11, 14, '#2b2b33'); v.box(5, 8, 9, 9, 12, 13, '#5bc0eb', glow=True)
+    v.box(22, 30, 9, 13, 2, 7, '#ffd23f'); v.box(24, 28, 13, 13, 3, 6, '#2f7de1')       # 아동안전지킴이집 스티커
+    return v
+
+
+save('counter', counter(), note='prop')
+
+
+def stove():
+    v = Vox(30, 14, 14)
+    v.box(0, 29, 0, 13, 0, 9, '#9aa3ad'); v.box(0, 29, 0, 13, 10, 10, '#5b626b')
+    for x in (6, 20):
+        v.cyl(x, 6, 3, 11, 11, '#2b2b33'); v.box(x - 3, x + 2, 3, 9, 12, 14, '#c8ced4')
+    return v
+
+
+save('stove', stove(), note='prop')
+
+
+def table():
+    v = Vox(24, 16, 12)
+    v.box(0, 23, 0, 15, 9, 10, '#f4f1ea')
+    for x in (1, 22):
+        for y in (1, 14): v.box(x, x, y, y, 0, 8, '#9aa3ad')
+    v.box(4, 9, 5, 9, 11, 11, '#e2463b'); v.box(14, 19, 6, 10, 11, 11, '#ff9f1c')       # 떡볶이·튀김
+    return v
+
+
+save('table', table(), note='prop')
+
+
+def stool():
+    v = Vox(6, 6, 7)
+    v.cyl(3, 3, 2.5, 6, 6, '#e2463b'); v.box(2, 3, 2, 3, 0, 5, '#9aa3ad')
+    return v
+
+
+save('stool', stool(), note='prop')
+
+
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
 _ft = Image.open(os.path.join(OUT, '..', 'assets', 'firetruck_slices.png'))
 _ft.save(os.path.join(OUT, 'firetruck.png'))
