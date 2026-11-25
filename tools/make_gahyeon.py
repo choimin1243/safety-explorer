@@ -51,7 +51,7 @@ r("""  // 송명초 정문
 r("""  prop('bus_shelter', 77, 33.4, Math.PI, 0); colliders.push({ x: wx(77), z: wz(33.2), r: 2.2 }); prop('busstop_sign', 79.6, 34.2, Math.PI, 0.3);
   label('🚌 송명초·능허대중 정류장', wx(77), 6, wz(33), { bg: '#2fa84f', fg: '#fff', scale: 0.8 });""", """  prop('bus_shelter', 72, 33.4, Math.PI, 0); colliders.push({ x: wx(72), z: wz(33.2), r: 2.2 }); prop('busstop_sign', 74.6, 33.55, Math.PI, 0.3);
   label('🚌 가현초·루원시티 정류장', wx(72), 6, wz(33), { bg: '#2fa84f', fg: '#fff', scale: 0.8 });""")
-r("prop('van', 27.4, 30.4, 0, 1.6);", "prop('van', 23.0, 28.6, 0, 1.6);")
+r("prop('van', 27.4, 30.4, 0, 1.6);", "prop('van', 22.5, 28.6, 0, 0.8);")
 r("""  label('🛝 근린공원 놀이터', wx(67.5), 6, wz(41.2), { bg: '#f59e0b', fg: '#fff', scale: 0.85 });
   playground.slide = prop('slide', 66, 44.2, 0, 0.6); playground.swing = prop('swing', 70.3, 43.5, 0, 0);
   colliders.push({ x: wx(68.9), z: wz(43.5), r: 0.5 }, { x: wx(71.8), z: wz(43.5), r: 0.5 });

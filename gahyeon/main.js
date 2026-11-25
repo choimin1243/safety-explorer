@@ -340,7 +340,7 @@ function placeProps() {
   prop('extinguisher', 15.8, 16.6, 0, 0.3); prop('vending', 15.6, 10.3, Math.PI / 2, 0.6);
   prop('flag', 2.2, 33.4, 0, 0.3); label('🚩 안전 집결지', wx(4.5), 5, wz(33.6), { bg: '#16a34a', fg: '#fff', scale: 0.8 });
   prop('trash_bins', 16.2, 31.5, Math.PI / 2, 1); prop('postbox', 14.6, 34.8, 0, 0.5); prop('bench', 9.5, 35.3, 0, 1);
-  prop('van', 23.0, 28.6, 0, 1.6);
+  prop('van', 22.5, 28.6, 0, 0.8);
   // 근린공원 놀이터
   label('🛝 오리 놀이터', wx(42.5), 6, wz(47.2), { bg: '#f59e0b', fg: '#fff', scale: 0.85 });
   playground.slide = prop('slide', 41, 50.2, 0, 0.6); playground.swing = prop('swing', 45.3, 49.5, 0, 0);
