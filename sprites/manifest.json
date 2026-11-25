@@ -1527,6 +1527,88 @@
 "vox": 0.12,
 "note": "prop"
 },
+"bld_gahyeon": {
+"w": 88,
+"l": 56,
+"n": 28,
+"vox": 0.5,
+"note": "world",
+"bx": 24,
+"by": 26,
+"tw": 11,
+"th": 7
+},
+"bld_gahyeon_gym": {
+"w": 48,
+"l": 40,
+"n": 21,
+"vox": 0.5,
+"note": "world",
+"bx": 39,
+"by": 19,
+"tw": 6,
+"th": 5
+},
+"bld_gahyeon_mid": {
+"w": 112,
+"l": 40,
+"n": 28,
+"vox": 0.5,
+"note": "world",
+"bx": 27,
+"by": 3,
+"tw": 14,
+"th": 5
+},
+"waterwheel": {
+"w": 30,
+"l": 22,
+"n": 34,
+"vox": 0.12,
+"note": "prop"
+},
+"duck_spring": {
+"w": 14,
+"l": 20,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"fountain": {
+"w": 30,
+"l": 30,
+"n": 26,
+"vox": 0.12,
+"note": "prop"
+},
+"school_stone": {
+"w": 30,
+"l": 12,
+"n": 22,
+"vox": 0.12,
+"note": "prop"
+},
+"apt_gate": {
+"w": 80,
+"l": 12,
+"n": 44,
+"vox": 0.12,
+"note": "prop"
+},
+"flower_bed": {
+"w": 32,
+"l": 10,
+"n": 8,
+"vox": 0.12,
+"note": "prop"
+},
+"drop_off_sign": {
+"w": 12,
+"l": 4,
+"n": 30,
+"vox": 0.12,
+"note": "prop"
+},
 "firetruck": {
 "w": 23,
 "l": 48,

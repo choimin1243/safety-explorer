@@ -1920,6 +1920,131 @@ def kid_desk():                         # 학원 작은 책상
 save('kid_desk', kid_desk(), note='prop')
 
 
+# ---------------- 가현초편: 실제 지도 발자국 학교 건물 + 동네 명소 ----------------
+GH = json.load(open(os.path.join(os.path.dirname(__file__), '..', 'data', 'gahyeon_grid.json')))
+
+
+def footprint_gh(chars):
+    cells = {(x, y) for y in range(GH['H']) for x in range(GH['W']) if GH['bldg'][y][x] in chars}
+    xs = [c[0] for c in cells]; ys = [c[1] for c in cells]
+    return cells, min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+
+
+for nm, chars, kw in (
+    ('bld_gahyeon', 'b', dict(wall='#f6ecd9', band='#3f8f5a', accent='#2fa84f', floors=4)),
+    ('bld_gahyeon_gym', 'c', dict(wall='#e9dcc0', band='#3f8f5a', gym=True, floors=2, name_board=False)),
+    ('bld_gahyeon_mid', 'm', dict(wall='#eef1f4', band='#7c5cc8', accent='#7c3aed', floors=4)),
+):
+    cells, bx, by, tw, th = footprint_gh(chars)
+    save(nm, school_building(cells, bx, by, tw, th, **kw), vox=0.5, note='world')
+    MANIFEST[nm].update(bx=bx, by=by, tw=tw, th=th)
+
+
+def waterwheel():                                               # 수차공원 물레방아
+    v = Vox(30, 22, 34)
+    v.box(0, 29, 0, 21, 0, 1, '#9aa3ad'); v.box(2, 27, 6, 15, 1, 2, '#5bc0eb', glow=True)      # 물길
+    for y0 in (4, 17):                                          # 바퀴 두 장
+        for a in range(0, 360, 8):
+            import math
+            r = 12; x = int(15 + r * math.cos(math.radians(a))); z = int(15 + r * math.sin(math.radians(a)))
+            v.box(x, x, y0, y0 + 1, z, z, '#8a5a32')
+        for a in range(0, 180, 30):
+            for t in range(-12, 13):
+                x = int(15 + t * math.cos(math.radians(a))); z = int(15 + t * math.sin(math.radians(a)))
+                v.put(x, y0, z, '#a8743f')
+    for a in range(0, 360, 30):                                 # 물받이 판
+        x = int(15 + 12 * math.cos(math.radians(a))); z = int(15 + 12 * math.sin(math.radians(a)))
+        v.box(x - 1, x + 1, 5, 16, z, z, '#c8955a')
+    v.box(14, 16, 2, 19, 14, 16, '#5a3a22')                     # 굴대
+    v.box(0, 3, 0, 21, 2, 18, '#7a8a6a'); v.box(26, 29, 0, 21, 2, 18, '#7a8a6a')   # 돌 기둥
+    v.box(0, 29, 0, 3, 28, 31, '#6b4a2a'); v.box(0, 29, 18, 21, 28, 31, '#6b4a2a')
+    return v
+
+
+save('waterwheel', waterwheel(), note='prop')
+
+
+def duck_spring():                                              # 오리 놀이터 스프링 오리
+    v = Vox(14, 20, 22)
+    for z in range(0, 7):
+        v.put(7, 10, z, '#9aa3ad'); v.put(6 + z % 2, 9 + z % 2, z, '#c8ced4')
+    v.box(3, 10, 5, 15, 7, 12, '#ffd23f'); v.box(4, 9, 4, 14, 13, 13, '#ffd23f')            # 몸통
+    v.box(4, 9, 14, 18, 12, 18, '#ffd23f'); v.box(5, 8, 18, 19, 14, 15, '#ff9f1c')           # 머리·부리
+    v.put(4, 17, 16, '#1d2a33'); v.put(9, 17, 16, '#1d2a33')
+    v.box(2, 3, 8, 12, 10, 12, '#ffe680'); v.box(10, 11, 8, 12, 10, 12, '#ffe680')        # 날개
+    v.box(3, 10, 2, 5, 10, 12, '#ffe680'); v.box(1, 12, 12, 12, 13, 13, '#e2463b')         # 꼬리·손잡이
+    return v
+
+
+save('duck_spring', duck_spring(), note='prop')
+
+
+def fountain():                                                 # 루에블리 분수대
+    v = Vox(30, 30, 26)
+    v.cyl(15, 15, 14, 0, 3, '#c8ced4'); v.cyl(15, 15, 12, 2, 3, '#5bc0eb')
+    for z in range(2, 4): v.cyl(15, 15, 12, z, z, '#5bc0eb')
+    v.cyl(15, 15, 6, 4, 8, '#dfe6ea'); v.cyl(15, 15, 5, 8, 8, '#7fd0f0')
+    v.cyl(15, 15, 2, 9, 14, '#dfe6ea')
+    for z in range(14, 24): v.cyl(15, 15, 1 + (24 - z) // 5, z, z, '#bfeaff')
+    for a in range(8):
+        import math
+        x = int(15 + 9 * math.cos(a * math.pi / 4)); y = int(15 + 9 * math.sin(a * math.pi / 4))
+        for z in range(4, 11): v.put(x, y, z, '#cfefff')
+    return v
+
+
+save('fountain', fountain(), note='prop')
+
+
+def school_stone():                                             # 교명 표지석 '가현초등학교'
+    v = Vox(30, 12, 22)
+    v.box(0, 29, 0, 11, 0, 2, '#9aa3ad')
+    v.box(2, 27, 2, 9, 3, 18, '#b8b0a2'); v.box(4, 24, 2, 8, 19, 20, '#a89f90')
+    v.box(5, 24, 10, 10, 6, 15, '#2f5d3a')
+    for x in range(7, 23, 4): v.box(x, x + 1, 10, 10, 8, 13, '#ffffff')
+    for x in (1, 28): v.box(x, x, 1, 10, 3, 5, '#7fb85a')
+    return v
+
+
+save('school_stone', school_stone(), note='prop')
+
+
+def apt_gate():                                                 # 아파트 단지 문주(입구 기둥 + 이름판)
+    v = Vox(80, 12, 44)
+    for x0 in (0, 70):
+        v.box(x0, x0 + 9, 0, 11, 0, 35, '#d9cdb8'); v.box(x0 + 2, x0 + 7, 11, 11, 6, 30, '#c2b49a')
+    v.box(0, 79, 2, 9, 36, 41, '#6b5a48'); v.box(18, 61, 9, 9, 37, 40, '#f4efe4')
+    for x in range(22, 58, 5): v.box(x, x + 2, 9, 9, 38, 39, '#2f5da8')
+    v.box(10, 69, 4, 7, 0, 0, '#c8ced4')
+    return v
+
+
+save('apt_gate', apt_gate(), note='prop')
+
+
+def flower_bed():                                               # 학교 앞 화단
+    v = Vox(32, 10, 8)
+    v.box(0, 31, 0, 9, 0, 3, '#a87a45'); v.box(1, 30, 1, 8, 4, 4, '#6b4a2a')
+    cols = ['#ff6b8a', '#ffd23f', '#ffffff', '#c86bff', '#ff9f1c']
+    for x in range(2, 30, 3):
+        for y in (2, 6):
+            v.box(x, x, y, y, 5, 5, '#3f8f3a'); v.put(x, y, 6, cols[(x + y) % 5]); v.put(x + 1, y, 6, cols[(x + y + 1) % 5])
+    return v
+
+
+save('flower_bed', flower_bed(), note='prop')
+
+
+def drop_off_sign():                                            # 승하차 구역 표지판
+    v = Vox(12, 4, 30)
+    v.box(5, 6, 1, 2, 0, 20, '#9aa3ad'); v.box(0, 11, 0, 3, 20, 29, '#2f7de1')
+    v.box(2, 9, 3, 3, 22, 27, '#ffffff'); v.box(4, 7, 3, 3, 23, 26, '#ffd23f')
+    return v
+
+
+save('drop_off_sign', drop_off_sign(), note='prop')
+
+
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
 _ft = Image.open(os.path.join(OUT, '..', 'assets', 'firetruck_slices.png'))
 _ft.save(os.path.join(OUT, 'firetruck.png'))

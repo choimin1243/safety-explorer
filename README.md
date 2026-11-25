@@ -15,3 +15,9 @@
 지도 데이터 © OpenStreetMap contributors (ODbL). 건물 높이는 줄였고 횡단보도·사람·소품은 수업용으로 넣었습니다.
 
 예전 버전: `/classic/`. three.js(MIT)는 `vendor/`에 포함.
+
+## 가현초편 (`/gahyeon/`)
+인천가현초 둘레(루원시티) OSM 지도로 만든 같은 게임입니다. 학교가 큰길 위에 오도록 지도를 180도 돌렸습니다.
+- `tools/gahyeon_grid.py tools/gahyeon_osm_raw.json data/gahyeon_grid.json` : 지도 격자 다듬기
+- `tools/make_gahyeon.py` : 송명편 `main.js` 에서 좌표·이름만 바꿔 `gahyeon/main.js` 생성 (송명편을 고친 뒤 다시 돌리기)
+- 새 스프라이트: 가현초 본관·체육관·가현중(실제 발자국), 수차공원 물레방아, 오리 스프링, 루에블리 분수대, 교명 표지석, 아파트 문주, 화단, 승하차 표지판
