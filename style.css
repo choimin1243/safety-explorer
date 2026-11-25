@@ -22,7 +22,7 @@ h1 { font-size: 28px; margin: 8px 0 6px; color: #e2581f; letter-spacing: 1px; }
 #panel { position: absolute; left: 10px; top: 10px; background: rgba(255, 253, 246, .94); border-radius: 14px; padding: 8px 10px; font-size: 13px; box-shadow: 0 4px 12px rgba(0, 0, 0, .15); pointer-events: auto; max-width: 230px; }
 .pt { font-weight: 800; color: #e2581f; cursor: pointer; }
 .pt .star { color: #b07a00; margin-left: 6px; }
-#mlist { margin-top: 4px; }
+#mlist { margin-top: 4px; max-height: 52vh; overflow-y: auto; }
 #panel.collapsed #mlist { display: none; }
 .mi { display: flex; align-items: center; gap: 5px; padding: 2px 0; opacity: .75; white-space: nowrap; }
 .mi .ic { width: 22px; height: 22px; border-radius: 50%; background: #e4e8ea; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; filter: grayscale(1); }

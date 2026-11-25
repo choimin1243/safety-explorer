@@ -314,7 +314,7 @@ function placeProps() {
     else if (c === 'g' && (x === 17 || x === 22) && y % 4 === 2 && (y < 33 || y > 39)) ginkgo.push([wx(x + 0.5), wz(y + 0.5)]);
     else if ((c === 'y' || c === 'g') && hash(x, y) > 0.93 && !nearRoad(x, y) && !(x >= PARK.x0 - 1 && x <= PARK.x1 + 1 && y >= PARK.y0 - 1 && y <= PARK.y1 + 1) && !(x >= SITE.x0 - 2 && x <= SITE.x1 + 2 && y >= SITE.y0 - 2 && y <= SITE.y1 + 2)) round.push([wx(x + 0.5), wz(y + 0.5), hash(y, x) * 6]);
   }
-  instanced('tree_ginkgo', ginkgo); instanced('tree_round', round);
+  instanced('tree_ginkgo', ginkgo); instanced('tree_round', round); treeSpots.push(...ginkgo, ...round);
   [...ginkgo, ...round].forEach(([x, z]) => colliders.push({ x, z, r: 0.9 }));
   // 교육로 가로등 · 스쿨존 울타리 · 표지판 · CCTV
   const lamps = []; for (let x = 26; x < W; x += 10) { lamps.push([wx(x), wz(34.2), Math.PI]); lamps.push([wx(x + 5), wz(38.8), 0]); }
@@ -368,7 +368,7 @@ function placeProps() {
   label('🏫 가현중학교', wx(34), 12, wz(5.5), { bg: '#7c3aed', fg: '#fff', scale: 1.1 });
   // 소화전·볼라드
   [[30, 38.8], [60, 34.2], [84, 38.8]].forEach(([x, y]) => prop('hydrant', x, y, 0, 0.3));
-  [[40, 38.6], [43, 38.6], [64, 38.6], [67, 38.6], [40, 34.4], [43, 34.4], [46, 34.4], [56, 34.4]].forEach(([x, y]) => prop('bollard', x, y, 0, 0.25));
+  [[40, 38.6], [43, 38.6], [64, 38.6], [67, 38.6], [40, 34.4], [43, 34.4]].forEach(([x, y]) => prop('bollard', x, y, 0, 0.25));
   // ---- 가현초 운동장 (본관 북쪽) ----
   prop('stage', 31, 25.3, Math.PI, 2.2); prop('flagpoles', 25.2, 25.2, 0, 1.0); prop('statue', 36.9, 25.3, 0, 0.8);
   prop('bleachers', 28.5, 18.5, Math.PI, 0); prop('bleachers', 33.5, 18.5, Math.PI, 0); for (let x = 26.5; x <= 35.5; x += 1) colliders.push({ x: wx(x), z: wz(18.4), r: 1.0 });
@@ -400,7 +400,7 @@ function placeProps() {
   // ---- 루에블리 단지 산책길 ----
   prop('garden', 52, 60.8, 0, 2.0); prop('bench', 49, 59.6, 0, 1); prop('bike_rack', 53.2, 57.4, 0, 1.2); prop('flower_bed', 44.5, 61.2, 0, 0); prop('stroller', 50.6, 62.2, 0.5, 0.4);
   // ---- 동네 생활 소품 (가현초편 2차) ----
-  const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); return g; };
+  const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); if (n.startsWith('tree_')) treeSpots.push([g.position.x, g.position.z]); return g; };
   D('shade_canopy', 44.2, 38.55, 0, 0.3); D('shade_canopy', 63.4, 38.55, 0, 0.3); D('shade_canopy', 37.0, 33.75, 0, 0);
   D('bus_info', 69.6, 33.55, 0, 0.3);
   for (const [x, y, a] of [[76.6, 33.7, 0.2], [77.3, 33.75, -0.1], [47.4, 33.7, 0.3], [24.3, 34.4, 1.5]]) D('shared_kick', x, y, a, 0.2);
@@ -417,7 +417,7 @@ function placeProps() {
   D('banner', 28.2, 33.6, 0, 0.3);
   for (const [x, y] of [[30, 34.5], [55, 38.5], [61, 34.5], [19.5, 31], [20.5, 45], [72, 38.5]]) D('manhole', x, y, 0, 0);
   D('speed_bump', 59.5, 28.5, Math.PI / 2, 0); D('speed_bump', 55, 24.5, 0, 0); D('speed_bump', 79, 20.5, Math.PI / 2, 0);
-  for (const [x, y] of [[37.3, 47.3], [52.6, 34.4], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
+  for (const [x, y] of [[37.3, 47.3], [52.6, 33.55], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
   for (const [x, y, a] of [[37.9, 31.0, 0.1], [38.5, 31.0, -0.1], [39.1, 31.0, 0]]) D('kid_bike', x, y, a, 0);
   label('🔔 안심 비상벨', wx(37.3), 4.2, wz(47.3), { bg: '#e2463b', fg: '#fff', scale: 0.5 });
   // ---- 담장: 가현초 울타리(정문만 열림) · 큰길 쪽 아파트 담장(횡단보도·정류장·산책길·미션 자리는 틈) ----
@@ -810,7 +810,85 @@ const M = [
     update() { if (near(60.5, 38.8, 1.6) && pressed.has('Space') && !waved) { waved = true; amb.stopAt = 62.2; amb.arrived = false; say('🙋 손을 흔들었어요! 구급차가 여기 선대요.', 'good', 3); }
       if (waved && amb.arrived && !medic) { medic = sprite('medic_0', wx(61), wz(39.6)); medic.userData.t = 0; }
       if (medic) { medic.userData.t += 1 / 60; const k = Math.min(1, medic.userData.t / 2.5); medic.position.set(wx(lerp(61, 60.6, k)), 0, wz(lerp(39.6, 44.4, k))); setSprite(medic, 'medic_' + (Math.floor(medic.userData.t * 4) % 2)); if (k >= 1) { finish(); } } } },
+  { id: 'dog', icon: '🐕', title: '목줄 없는 큰 개', npc: ['kid2', 'kid2_0', 54.1, 50.4, Math.PI],
+    talk: [{ who: 'kid2', say: '저기 산책길에 목줄 없는 큰 개가 있어! 무서워…' },
+      { who: 'kid2', ask: '모르는 개가 나한테 달려오면 어떻게 할까?', choices: [
+        { t: '소리 지르며 뛰어서 도망간다', why: '뛰면 개가 쫓아오고 더 흥분해요.' },
+        { t: '나무처럼 가만히 서서, 눈을 마주치지 않고 팔을 몸에 붙인다', ok: true, why: '맞아요! 가만히 있으면 개가 냄새만 맡고 지나가요. 넘어지면 공처럼 웅크려요.' },
+        { t: '귀여우니까 손을 내밀어 쓰다듬는다', why: '모르는 개는 만지지 않아요. 주인에게 먼저 물어봐요.' }] },
+      { who: 'kid2', say: '산책길 아래쪽(노란 고리)으로 가야 해. 개가 오면 나무처럼 서 있어!' }],
+    start() { goal = [55.3, 64.2, 1.4]; dogEv = { g: sprite('dog', wx(55.3), wz(60.8), Math.PI, { scale: 1.9 }), phase: 'idle', t: 0 }; },
+    update(dt) { const D = dogEv, g = D.g, px = wx(player.tx), pz = wz(player.ty), dx = px - g.position.x, dz = pz - g.position.z, d = Math.hypot(dx, dz) / T; D.t += dt;
+      if (D.phase === 'idle' && d < 7) { D.phase = 'come'; sfx.alarm(); say('🐕 멍멍! 개가 달려와요! <b>가만히</b> 서 있어요 (손 떼기).', 'warn', 3); }
+      if (D.phase === 'come') { if (d > 1.3) { g.position.x += dx / d / T * 3.5 * T * dt; g.position.z += dz / d / T * 3.5 * T * dt; g.rotation.y = Math.atan2(dx, dz); } else { D.phase = 'sniff'; D.t = 0; } }
+      if (D.phase === 'sniff' && d > 3) D.phase = 'come';
+      if (D.phase === 'sniff') { g.rotation.y = Math.atan2(dx, dz) + Math.sin(D.t * 9) * 0.3;
+        if (player.speed > 1 && player.frozen <= 0) { sfx.bad(); mistake(); beep(300, 0.15, 'square', 0.08); beep(260, 0.2, 'square', 0.08, 0.2); say('🐕 왈왈! 움직이니까 개가 흥분했어요. <b>나무처럼</b> 가만히!', 'warn', 3); player.frozen = 0.8; D.t = 0; }
+        if (D.t > 3) { D.phase = 'leave'; D.owner = sprite('mom_0', wx(55.3), wz(66.5), Math.PI); say('주인이 왔어요! "죄송해요, 목줄 할게요." 이제 지나가요.', 'good', 3); } }
+      if (D.phase === 'leave') { const o = D.owner, ox = o.position.x - g.position.x, oz = o.position.z - g.position.z, od = Math.hypot(ox, oz);
+        if (od > 2) { g.position.x += ox / od * 5 * dt; g.position.z += oz / od * 5 * dt; g.rotation.y = Math.atan2(ox, oz); o.position.z -= 0.6 * dt; } else D.phase = 'gone'; }
+      if (D.phase === 'gone' && near(55.3, 64.2, 1.6)) finish(); },
+    end() { if (dogEv) { setTimeout(() => { scene.remove(dogEv.g); dogEv.owner && scene.remove(dogEv.owner); dogEv = null; }, 4000); } } },
+  { id: 'storm', icon: '⛈️', title: '소나기와 번개', npc: ['officer', 'officer_0', 47.2, 38.6, Math.PI],
+    talk: [{ who: 'officer', say: '하늘이 깜깜해졌지? 곧 소나기가 쏟아지고 번개가 칠 거야.' },
+      { who: 'officer', ask: '밖에서 번개가 치면 어디로 피할까?', choices: [
+        { t: '키 큰 나무 밑에서 비를 피한다', why: '번개는 높은 곳에 떨어져요. 나무 밑은 아주 위험해요!' },
+        { t: '가까운 건물 안으로 들어간다', ok: true, why: '맞아요! 건물 안이 가장 안전해요. 쇠붙이 우산은 접고, 넓은 운동장에 서 있지 않아요.' },
+        { t: '우산을 높이 들고 넓은 곳에 서 있는다', why: '넓은 곳에서 우산을 들면 내가 가장 높은 곳이 돼요.' }] },
+      { who: 'officer', say: '나무를 피해서 저 아파트 공동현관(노란 고리) 안으로 대피하렴!' }],
+    start() { goal = [40, 43.4, 1.3]; stormFx(true); },
+    update(dt) { stormT -= dt; if (stormT <= 0) { stormT = 2 + Math.random() * 2.5; flash(); }
+      treeHit -= dt; const tr = treeSpots.find(([x, z]) => Math.hypot(x - wx(player.tx), z - wz(player.ty)) < 4.2); if (treeHit <= 0 && tr) { treeHit = 1.6; flash(); sfx.bad(); mistake(); say('⚡ 나무 밑은 번개가 떨어질 수 있어요! 나무에서 멀리 떨어져요.', 'warn', 3); const ax = wx(player.tx) - tr[0], az = wz(player.ty) - tr[1], al = Math.hypot(ax, az) || 1; const nx = tx(tr[0] + ax / al * 5.6), ny = ty(tr[1] + az / al * 5.6); if (!blockedAt(nx, ny)) { player.tx = nx; player.ty = ny; } player.frozen = 0.6; }
+      if (near(40, 43.4, 1.5)) finish(); },
+    end() { stormFx(false); } },
+  { id: 'dust', icon: '😷', title: '미세먼지 매우 나쁨', npc: ['mom', 'mom_0', 48.6, 63.4, -Math.PI / 2],
+    talk: [{ who: 'mom', say: '오늘 미세먼지가 "매우 나쁨"이래. 하늘이 뿌옇지?' },
+      { who: 'mom', ask: '미세먼지가 매우 나쁜 날 학교에 갈 때는?', choices: [
+        { t: 'KF80 이상 마스크를 코까지 꼭 맞게 쓰고, 다녀와서 손·얼굴을 씻는다', ok: true, why: '맞아요! 밖에서 뛰는 활동은 줄이고, 물을 자주 마셔요.' },
+        { t: '답답하니까 마스크를 턱에 걸친다', why: '코와 입을 다 가려야 먼지를 막아요.' },
+        { t: '운동장에서 오래 뛰어논다', why: '숨을 크게 쉬면 미세먼지를 더 많이 마셔요.' }] },
+      { who: 'mom', say: '현관 옆 벤치 위 마스크를 꼭 쓰고, 학교 정문까지 가렴!' }],
+    start() { goal = [43.0, 60.3, 1.0]; items.mask = sprite('mask_item', wx(43.0), wz(60.3), 0, { scale: 1.6 }); maskOn = false; dustLv = 0; dustFx(true); $('meter').classList.remove('hidden'); $('meter-label').textContent = '미세먼지 들이마심'; },
+    update(dt) { if (!maskOn && items.mask && near(43.0, 60.3, 1.2)) { scene.remove(items.mask); items.mask = null; maskOn = true; sfx.pick(); say('😷 마스크 착용! 코까지 꼭 눌러 맞췄어요. 이제 학교 정문으로!', 'good', 3); goal = [42, 32.4, 1.6]; }
+      if (!maskOn && player.speed > 0.5) dustLv += dt * 9; else dustLv = Math.max(0, dustLv - dt * (maskOn ? 12 : 3));
+      $('meter-fill').style.width = Math.min(100, dustLv) + '%';
+      if (dustLv >= 100) { sfx.bad(); mistake(); dustLv = 0; say('😷 콜록콜록! 마스크 없이 다니면 먼지를 마셔요. 먼저 <b>마스크</b>!', 'warn', 3); player.frozen = 0.8; }
+      if (maskOn && near(42, 32.4, 1.8)) finish(); },
+    end() { dustFx(false); $('meter').classList.add('hidden'); } },
+  { id: 'ice', icon: '🧊', title: '꽁꽁 빙판길', npc: ['grandma', 'grandma_0', 58.4, 34.6, -Math.PI / 2],
+    talk: [{ who: 'grandma', say: '아이고, 밤새 눈이 녹았다 얼어서 인도가 꽁꽁 얼었구나.' },
+      { who: 'grandma', ask: '빙판길은 어떻게 걸어야 할까?', choices: [
+        { t: '주머니에서 손을 빼고, 보폭을 좁게 천천히 걷는다', ok: true, why: '맞아요! 넘어질 때 손으로 짚을 수 있게 손은 밖에 둬요.' },
+        { t: '미끄럼 타듯 신나게 달린다', why: '빙판에서 뛰면 뒤로 넘어져 머리를 다칠 수 있어요.' },
+        { t: '손을 주머니에 넣고 빨리 걷는다', why: '손을 넣으면 넘어질 때 짚지 못해요.' }] },
+      { who: 'grandma', say: 'Shift(몸 낮추기)로 종종걸음 해서 정문 쪽(노란 고리)까지 가 보렴.' }],
+    start() { goal = [44.6, 34.5, 1.2]; ices = [48, 50, 52, 54, 56].map((x) => sprite('ice_patch', wx(x), wz(34.5), 0, { shadow: false, scale: 1.1 })); iceSlip = 0; say('🧊 빙판이에요! <b>Shift</b>로 천천히!', 'warn', 3); },
+    update(dt) { iceSlip -= dt; const onIce = player.tx > 47 && player.tx < 57 && player.ty > 33.9 && player.ty < 35.1;
+      if (onIce && player.speed > 3.5 && iceSlip <= 0) { iceSlip = 1.4; sfx.bad(); mistake(); say('🧊 꽈당! 빙판에서 빨리 걸으면 미끄러져요. <b>Shift</b>로 천천히!', 'warn', 3); player.frozen = 1.0; player.face += Math.PI; }
+      if (near(44.6, 34.5, 1.4)) finish(); },
+    end() { setTimeout(() => { (ices || []).forEach((g) => scene.remove(g)); ices = null; }, 3000); } },
+  { id: 'lost', icon: '🧒', title: '길 잃은 동생', npc: ['little', 'little_0', 47.4, 57.4, Math.PI],
+    talk: [{ who: 'little', say: '흐앙… 엄마가 없어졌어… 엄마 어디 있어…' },
+      { who: 'little', ask: '길 잃은 어린 동생을 만나면 어떻게 할까?', choices: [
+        { t: '내가 아는 길로 엄마를 찾으러 멀리 데려간다', why: '어린이끼리 멀리 다니면 더 길을 잃어요.' },
+        { t: '가까운 경비실·아동안전지킴이집 어른에게 함께 가서 알린다', ok: true, why: '맞아요! 어른이 방송하거나 112에 알려서 보호자를 찾아 줘요.' },
+        { t: '모른 척 지나간다', why: '도움이 필요한 동생이에요. 어른에게 알려 줘요.' }] },
+      { who: 'little', say: '…응. 손 잡고 같이 가자. 천천히 가 줘.' }],
+    start() { goal = [15.4, 54.8, 1.5]; lostKid = { g: npcs.lost.g, slow: 0 }; npcs.lost.g.visible = true; colliders.splice(colliders.findIndex((c) => c.npc === 'lost'), 1); say('🧒 동생과 함께 <b>경비실</b>(서쪽 단지 출입구)까지! 횡단보도로 건너요.', '', 4); },
+    update(dt) { const g = lostKid.g, px = wx(player.tx), pz = wz(player.ty), dx = px - g.position.x, dz = pz - g.position.z, d = Math.hypot(dx, dz) / T;
+      if (d > 7) { lostKid.slow -= dt; if (lostKid.slow <= 0) { lostKid.slow = 3; say('🧒 "언니(형아), 같이 가!" 동생이 못 따라와요. 돌아가서 <b>천천히</b> 함께 가요.', 'warn', 3); } setSprite(g, 'little_0'); }
+      else if (d > 1.2) { const v = Math.min(4.2, d * 2.2); g.position.x += dx / d / T * v * T * dt; g.position.z += dz / d / T * v * T * dt; g.rotation.y = Math.atan2(dx, dz); setSprite(g, 'little_' + (Math.floor(time * 4) % 2)); }
+      if (near(15.4, 54.8, 1.8)) { if (d < 3.5) finish(); else if (lostKid.slow <= 0) { lostKid.slow = 3; say('동생이 아직 멀리 있어요. 함께 와야 해요!', 'warn', 2.5); } } },
+    end() { say('🙇 경비 아저씨: "고맙다! 방송해서 엄마를 찾아 줄게."', 'good', 4); } },
 ];
+let dogEv = null, stormT = 0, treeHit = 0, maskOn = false, dustLv = 0, ices = null, iceSlip = 0, lostKid = null;
+function flash() { const f = $('flashfx'); if (!f) return; f.style.opacity = 0.85; setTimeout(() => (f.style.opacity = 0), 90); setTimeout(() => (f.style.opacity = 0.6), 160); setTimeout(() => (f.style.opacity = 0), 240); beep(70, 0.9, 'sawtooth', 0.09, 0.35); beep(50, 1.2, 'sawtooth', 0.07, 0.5); }
+function stormFx(on) {
+  if (!$('rainfx')) { const st = document.createElement('style'); st.textContent = '#rainfx{position:fixed;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity .6s;background:repeating-linear-gradient(105deg,rgba(200,220,255,.0) 0 14px,rgba(200,220,255,.45) 14px 15px);background-size:60px 60px;animation:rain .35s linear infinite}#rainfx.on{opacity:1}@keyframes rain{to{background-position:-18px 60px}}#flashfx{position:fixed;inset:0;pointer-events:none;z-index:6;background:#fff;opacity:0;transition:opacity .05s}'; document.head.appendChild(st);
+    const r = document.createElement('div'); r.id = 'rainfx'; document.body.appendChild(r); const f = document.createElement('div'); f.id = 'flashfx'; document.body.appendChild(f); }
+  $('rainfx').classList.toggle('on', on); scene.background.set(on ? 0x6f7f8f : 0xbfe3f5); scene.fog.color.set(on ? 0x6f7f8f : 0xbfe3f5); stormT = 1.5; treeHit = 0;
+}
+function dustFx(on) { scene.background.set(on ? 0xc9c0a2 : 0xbfe3f5); scene.fog.color.set(on ? 0xc9c0a2 : 0xbfe3f5); scene.fog.near = on ? 18 : 90; scene.fog.far = on ? 70 : 190; }
 let goal = null, items = {}, missionWalkers = [], parkCarT = 0, parkCar = null, playStage = 0, swingOn = false, strangerFollow = 0, fireOn = false, smokeLevel = 0, smokeCough = 0, quake = null, amb = null, waved = false, medic = null;
 const near = (x, y, r) => Math.hypot(player.tx - x, player.ty - y) < r;
 function spawnWalkerFor(name, path, speed) { const before = walkers.length; addWalker(name, path, speed); missionWalkers.push(walkers[before]); }
@@ -820,7 +898,7 @@ function startMission(m) {
   talk(m.talk, () => { S.pending = false; S.active = m; m.start(); renderList(); say(`${m.icon} <b>${m.title}</b> 미션 시작!`, '', 2.4); });
 }
 function finish() {
-  const m = S.active; if (!m) return;
+  const m = S.active; if (!m) return; m.end && m.end();
   const stars = Math.max(1, 3 - S.mistakes);
   S.done[m.id] = true; S.stars[m.id] = Math.max(S.stars[m.id] || 0, stars); S.active = null; S.mistakes = 0; goal = null;
   if (markers[m.id]) markers[m.id].visible = false;
@@ -831,13 +909,13 @@ function finish() {
 }
 function renderList() {
   $('mlist').innerHTML = M.map((m) => `<div class="mi ${S.done[m.id] ? 'done' : ''} ${S.active === m ? 'active' : ''}"><span class="ic">${m.icon}</span>${m.title} <span class="st">${S.stars[m.id] ? '⭐'.repeat(S.stars[m.id]) : ''}</span></div>`).join('');
-  $('done-count').textContent = Object.keys(S.done).length; $('star-total').textContent = '⭐' + Object.values(S.stars).reduce((a, b) => a + b, 0) + (badges.size ? ' 🏅' + badges.size : '');
+  $('done-count').textContent = Object.keys(S.done).length; $('done-count').nextSibling.textContent = '/' + M.length + ' '; $('star-total').textContent = '⭐' + Object.values(S.stars).reduce((a, b) => a + b, 0) + (badges.size ? ' 🏅' + badges.size : '');
 }
 $('actbtn').addEventListener('click', (e) => { e.stopPropagation(); clickAct = true; });
 $('panel-toggle').addEventListener('click', () => $('panel').classList.toggle('collapsed'));
 function showCert() {
   $('cert-name').textContent = ($('name').value || '').trim() || '탐험대원';
-  const tot = Object.values(S.stars).reduce((a, b) => a + b, 0); $('cert-stars').textContent = `모은 별 ⭐ ${tot} / 30`;
+  const tot = Object.values(S.stars).reduce((a, b) => a + b, 0); $('cert-stars').textContent = `모은 별 ⭐ ${tot} / ${M.length * 3}`;
   const d = new Date(); $('cert-date').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 · 가현 안전 탐험대`;
   $('cert').classList.remove('hidden'); sfx.good();
 }
@@ -860,6 +938,7 @@ function dropRubbleAt(x, y) { const r = sprite('rubble', wx(x), wz(y), Math.rand
 function updateRubble(dt) { for (let i = rubbles.length - 1; i >= 0; i--) { const r = rubbles[i]; if (r.g.position.y > 0) { r.v += 30 * dt; r.g.position.y = Math.max(0, r.g.position.y - r.v * dt); } if ((r.life -= dt) <= 0) { scene.remove(r.g); rubbles.splice(i, 1); } } }
 
 // ---- 연기 · 흔들림 · 그네 ----
+const treeSpots = [];                 // 나무 위치(세계 좌표) — 번개 미션에서 씀
 const smokes = [];
 function updateFx(dt, time) {
   if (fireOn && smokes.length < 70 && Math.random() < dt * 30) { const s = sprite('smoke', wx(15.2 + Math.random() * 2.4), wz(9 + Math.random() * 13), 0, { shadow: false }); s.position.y = 2.2 + Math.random(); s.userData = { ...s.userData, vx: (Math.random() - 0.5) * 1.2, vz: (Math.random() - 0.5) * 1.2, life: 5 + Math.random() * 3 }; s.scale.setScalar(2); smokes.push(s); }
@@ -999,7 +1078,7 @@ ROOMS.snack.task = { mode: 'hunt', title: '분식집에서 위험한 것 찾기'
   { spr: 'puddle', x: 1.8, y: 1.9, sc: 1.3, name: '쏟은 국물', why: '바닥에 쏟은 국물은 미끄럽고 뜨거워요. 어른에게 알려요.' }] };
 Object.values(ROOMS).forEach((R, i) => { R.oy = i * 40; });   // 방끼리 멀리 떨어뜨려 옆 방이 안 보이게
 NAMES.pe_teacher = '체육 선생님'; NAMES.nurse = '보건 선생님'; NAMES.cook = '조리사님'; NAMES.tutor = '학원 선생님'; NAMES.pharmacist = '약사 선생님'; NAMES.master = '태권도 관장님'; NAMES.scientist = '과학 선생님';
-NAMES.clerk = '편의점 점원'; NAMES.owner = '분식집 사장님'; NAMES.barista = '바리스타';
+NAMES.kid2 = '친구 민준'; NAMES.little = '길 잃은 동생'; NAMES.clerk = '편의점 점원'; NAMES.owner = '분식집 사장님'; NAMES.barista = '바리스타';
 const badges = new Set();
 function roomTex(id, kind, R) {
   const c = document.createElement('canvas'); const g = c.getContext('2d');
@@ -1275,7 +1354,8 @@ function frame(dt, noRender = false) {
   clickAct = false; document.body.classList.toggle('inroom', !!player.room);
   if (!noRender) renderer.render(scene, camera); endFrame(); dbg();
 }
-function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; if (!document.hidden) frame(dt); requestAnimationFrame(loop); }
+let testPause = false;   // 테스트 때 실시간 진행을 멈춰 G.step 만으로 움직이게
+function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; if (!document.hidden && !testPause) frame(dt); requestAnimationFrame(loop); }
 
 async function init() {
   await loadAll();
@@ -1311,7 +1391,7 @@ window.G = {
   sig: (id) => sigState(CW.find((c) => c.id === id)), setSimT: (t) => { simT = t; },
   state: () => ({ tx: +player.tx.toFixed(2), ty: +player.ty.toFixed(2), tile: tile(player.tx, player.ty), crouch: player.crouch, ride: player.ride, active: S.active?.id || null, mistakes: S.mistakes, done: Object.keys(S.done), stars: { ...S.stars }, dialog: !!UI.dialog, goal, cars: cars.length, banner: $('banner').textContent }),
   answerAll: () => { let n = 0; while (UI.dialog && n++ < 40) { const ok = [...document.querySelectorAll('#dchoices button')].find((b) => b.dataset.ok === '1' && !b.disabled); if (ok) ok.click(); else if (!$('dnext').classList.contains('hidden')) $('dnext').click(); else break; } },
-  zoom: (z) => { zoom = z; }, room: () => player.room, exit: () => player.room && exitRoom(), rfb: (x, y) => [GRID.bldg[y][x], roomForBuilding(x, y), blocks[y * W + x]], dbgBump: () => ({ t: bump.t, face: player.face, room: player.room, act: S.active?.id, pend: S.pending }), enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
+  pause: (on = true) => { testPause = on; }, zoom: (z) => { zoom = z; }, room: () => player.room, exit: () => player.room && exitRoom(), rfb: (x, y) => [GRID.bldg[y][x], roomForBuilding(x, y), blocks[y * W + x]], dbgBump: () => ({ t: bump.t, face: player.face, room: player.room, act: S.active?.id, pend: S.pending }), enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
   talkTo: (id) => { const m = M.find((x) => x.id === id); G.tp(m.npc[2], m.npc[3] + 1.2); startMission(m); },
   missions: () => M.map((m) => m.id), parkCar: () => parkCar ? +tx(parkCar.position.x).toFixed(1) : null, cars: () => cars.map((c) => ({ n: c.name, lane: c.lane, p: +c.p.toFixed(1), v: +c.v.toFixed(1), s: c.special || '' })),
 };

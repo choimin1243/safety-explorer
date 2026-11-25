@@ -313,7 +313,7 @@ function placeProps() {
     else if (c === 'g' && (x === 17 || x === 22) && y % 4 === 2 && (y < 33 || y > 39)) ginkgo.push([wx(x + 0.5), wz(y + 0.5)]);
     else if ((c === 'y' || c === 'g') && hash(x, y) > 0.93 && !nearRoad(x, y) && !(x >= PARK.x0 - 1 && x <= PARK.x1 + 1 && y >= PARK.y0 - 1 && y <= PARK.y1 + 1) && !(x >= SITE.x0 - 2 && x <= SITE.x1 + 2 && y >= SITE.y0 - 2 && y <= SITE.y1 + 2)) round.push([wx(x + 0.5), wz(y + 0.5), hash(y, x) * 6]);
   }
-  instanced('tree_ginkgo', ginkgo); instanced('tree_round', round);
+  instanced('tree_ginkgo', ginkgo); instanced('tree_round', round); treeSpots.push(...ginkgo, ...round);
   [...ginkgo, ...round].forEach(([x, z]) => colliders.push({ x, z, r: 0.9 }));
   // 교육로 가로등 · 스쿨존 울타리 · 표지판 · CCTV
   const lamps = []; for (let x = 26; x < W; x += 10) { lamps.push([wx(x), wz(34.2), Math.PI]); lamps.push([wx(x + 5), wz(38.8), 0]); }
@@ -785,7 +785,7 @@ function startMission(m) {
   talk(m.talk, () => { S.pending = false; S.active = m; m.start(); renderList(); say(`${m.icon} <b>${m.title}</b> 미션 시작!`, '', 2.4); });
 }
 function finish() {
-  const m = S.active; if (!m) return;
+  const m = S.active; if (!m) return; m.end && m.end();
   const stars = Math.max(1, 3 - S.mistakes);
   S.done[m.id] = true; S.stars[m.id] = Math.max(S.stars[m.id] || 0, stars); S.active = null; S.mistakes = 0; goal = null;
   if (markers[m.id]) markers[m.id].visible = false;
@@ -796,13 +796,13 @@ function finish() {
 }
 function renderList() {
   $('mlist').innerHTML = M.map((m) => `<div class="mi ${S.done[m.id] ? 'done' : ''} ${S.active === m ? 'active' : ''}"><span class="ic">${m.icon}</span>${m.title} <span class="st">${S.stars[m.id] ? '⭐'.repeat(S.stars[m.id]) : ''}</span></div>`).join('');
-  $('done-count').textContent = Object.keys(S.done).length; $('star-total').textContent = '⭐' + Object.values(S.stars).reduce((a, b) => a + b, 0) + (badges.size ? ' 🏅' + badges.size : '');
+  $('done-count').textContent = Object.keys(S.done).length; $('done-count').nextSibling.textContent = '/' + M.length + ' '; $('star-total').textContent = '⭐' + Object.values(S.stars).reduce((a, b) => a + b, 0) + (badges.size ? ' 🏅' + badges.size : '');
 }
 $('actbtn').addEventListener('click', (e) => { e.stopPropagation(); clickAct = true; });
 $('panel-toggle').addEventListener('click', () => $('panel').classList.toggle('collapsed'));
 function showCert() {
   $('cert-name').textContent = ($('name').value || '').trim() || '탐험대원';
-  const tot = Object.values(S.stars).reduce((a, b) => a + b, 0); $('cert-stars').textContent = `모은 별 ⭐ ${tot} / 30`;
+  const tot = Object.values(S.stars).reduce((a, b) => a + b, 0); $('cert-stars').textContent = `모은 별 ⭐ ${tot} / ${M.length * 3}`;
   const d = new Date(); $('cert-date').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 · 송명 안전 탐험대`;
   $('cert').classList.remove('hidden'); sfx.good();
 }
@@ -825,6 +825,7 @@ function dropRubbleAt(x, y) { const r = sprite('rubble', wx(x), wz(y), Math.rand
 function updateRubble(dt) { for (let i = rubbles.length - 1; i >= 0; i--) { const r = rubbles[i]; if (r.g.position.y > 0) { r.v += 30 * dt; r.g.position.y = Math.max(0, r.g.position.y - r.v * dt); } if ((r.life -= dt) <= 0) { scene.remove(r.g); rubbles.splice(i, 1); } } }
 
 // ---- 연기 · 흔들림 · 그네 ----
+const treeSpots = [];                 // 나무 위치(세계 좌표) — 번개 미션에서 씀
 const smokes = [];
 function updateFx(dt, time) {
   if (fireOn && smokes.length < 70 && Math.random() < dt * 30) { const s = sprite('smoke', wx(15.2 + Math.random() * 2.4), wz(9 + Math.random() * 13), 0, { shadow: false }); s.position.y = 2.2 + Math.random(); s.userData = { ...s.userData, vx: (Math.random() - 0.5) * 1.2, vz: (Math.random() - 0.5) * 1.2, life: 5 + Math.random() * 3 }; s.scale.setScalar(2); smokes.push(s); }
@@ -1240,7 +1241,8 @@ function frame(dt, noRender = false) {
   clickAct = false; document.body.classList.toggle('inroom', !!player.room);
   if (!noRender) renderer.render(scene, camera); endFrame(); dbg();
 }
-function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; if (!document.hidden) frame(dt); requestAnimationFrame(loop); }
+let testPause = false;   // 테스트 때 실시간 진행을 멈춰 G.step 만으로 움직이게
+function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; if (!document.hidden && !testPause) frame(dt); requestAnimationFrame(loop); }
 
 async function init() {
   await loadAll();
@@ -1276,7 +1278,7 @@ window.G = {
   sig: (id) => sigState(CW.find((c) => c.id === id)), setSimT: (t) => { simT = t; },
   state: () => ({ tx: +player.tx.toFixed(2), ty: +player.ty.toFixed(2), tile: tile(player.tx, player.ty), crouch: player.crouch, ride: player.ride, active: S.active?.id || null, mistakes: S.mistakes, done: Object.keys(S.done), stars: { ...S.stars }, dialog: !!UI.dialog, goal, cars: cars.length, banner: $('banner').textContent }),
   answerAll: () => { let n = 0; while (UI.dialog && n++ < 40) { const ok = [...document.querySelectorAll('#dchoices button')].find((b) => b.dataset.ok === '1' && !b.disabled); if (ok) ok.click(); else if (!$('dnext').classList.contains('hidden')) $('dnext').click(); else break; } },
-  zoom: (z) => { zoom = z; }, room: () => player.room, exit: () => player.room && exitRoom(), rfb: (x, y) => [GRID.bldg[y][x], roomForBuilding(x, y), blocks[y * W + x]], dbgBump: () => ({ t: bump.t, face: player.face, room: player.room, act: S.active?.id, pend: S.pending }), enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
+  pause: (on = true) => { testPause = on; }, zoom: (z) => { zoom = z; }, room: () => player.room, exit: () => player.room && exitRoom(), rfb: (x, y) => [GRID.bldg[y][x], roomForBuilding(x, y), blocks[y * W + x]], dbgBump: () => ({ t: bump.t, face: player.face, room: player.room, act: S.active?.id, pend: S.pending }), enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
   talkTo: (id) => { const m = M.find((x) => x.id === id); G.tp(m.npc[2], m.npc[3] + 1.2); startMission(m); },
   missions: () => M.map((m) => m.id), parkCar: () => parkCar ? +tx(parkCar.position.x).toFixed(1) : null, cars: () => cars.map((c) => ({ n: c.name, lane: c.lane, p: +c.p.toFixed(1), v: +c.v.toFixed(1), s: c.special || '' })),
 };

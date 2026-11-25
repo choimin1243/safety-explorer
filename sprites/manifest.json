@@ -335,6 +335,20 @@
 "vox": 0.075,
 "note": "person"
 },
+"little_0": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
+"little_1": {
+"w": 13,
+"l": 11,
+"n": 21,
+"vox": 0.075,
+"note": "person"
+},
 "barista_0": {
 "w": 13,
 "l": 11,
@@ -1788,6 +1802,20 @@
 "w": 30,
 "l": 2,
 "n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"mask_item": {
+"w": 12,
+"l": 10,
+"n": 8,
+"vox": 0.12,
+"note": "prop"
+},
+"ice_patch": {
+"w": 36,
+"l": 36,
+"n": 1,
 "vox": 0.12,
 "note": "prop"
 },

@@ -193,6 +193,7 @@ PEOPLE = {
     'nurse':    dict(shirt='#f4f6f8', pants='#ff9fb8', hair='#3a2a20', adult=True, long_hair=True),
     'cook':     dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#3a2a20', adult=True, hat='#ffffff', mask=True),
     'tutor':    dict(shirt='#8e5cd9', pants='#3c4048', hair='#2b1d14', adult=True, glasses=True),
+    'little':   dict(shirt='#ffd23f', pants='#5b8def', hair='#3a2a20', hat='#ffd23f', bag='#ff9fb8'),
     'barista':  dict(shirt='#f4efe4', pants='#2b2b33', hair='#5a3a22', adult=True, vest='#6b4a2a', hat='#2b2b33'),
 }
 BELT = {'master': '#1d1a1a', 'kid_dobok': '#ffd23f'}
@@ -2277,6 +2278,27 @@ def menu_wall():                                                # 벽 메뉴판
 
 for nm, fn in (('cake_case', cake_case), ('cafe_set', cafe_chair_table), ('hot_cup', hot_cup), ('menu_wall', menu_wall)):
     save(nm, fn(), note='prop')
+
+
+# ---------------- 이벤트 미션 소품 ----------------
+def mask_item():                                                # KF94 마스크 상자 + 마스크
+    v = Vox(12, 10, 8)
+    v.box(0, 11, 0, 9, 0, 4, '#f4f6f8'); v.box(0, 11, 9, 9, 1, 3, '#2f7de1'); v.box(2, 9, 9, 9, 2, 2, '#ffffff')
+    v.box(2, 9, 2, 7, 5, 6, '#ffffff'); v.box(1, 1, 3, 6, 5, 5, '#c8ced4'); v.box(10, 10, 3, 6, 5, 5, '#c8ced4'); v.box(3, 8, 4, 5, 7, 7, '#e8eef2')
+    return v
+
+
+def ice_patch():                                                # 빙판 (납작)
+    v = Vox(36, 36, 1)
+    for y in range(36):
+        for x in range(36):
+            d = ((x - 18) / 17) ** 2 + ((y - 18) / 15) ** 2
+            if d <= 1: v.put(x, y, 0, '#e8f6ff' if (x * 3 + y) % 7 else '#ffffff')
+    return v
+
+
+save('mask_item', mask_item(), note='prop')
+save('ice_patch', ice_patch(), note='prop')
 
 
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
