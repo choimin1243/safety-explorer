@@ -2213,23 +2213,27 @@ for nm, fn in (('shade_canopy', shade_canopy), ('shared_kick', shared_kick), ('b
 
 
 # ---------------- 담장: 1칸(=38복셀) 짜리 조각을 이어 붙인다 ----------------
-def school_fence():                                             # 학교 초록 철망 울타리
-    v = Vox(38, 3, 16)
-    v.box(0, 37, 0, 2, 0, 1, '#9aa3ad')
-    for x in (0, 19): v.box(x, x + 1, 0, 2, 0, 15, '#2f7a45')
-    v.box(0, 37, 1, 1, 14, 15, '#2f7a45'); v.box(0, 37, 1, 1, 7, 7, '#2f7a45')
-    for x in range(2, 38, 2):
-        for z in range(2, 14):
-            if (x + z) % 4 == 0: v.put(x, 1, z, '#3f9a5a')
+def school_fence():                                             # 학교 초록 철망 울타리(아이 키보다 높게)
+    v = Vox(38, 4, 30)
+    v.box(0, 37, 0, 3, 0, 2, '#b8b0a2')                         # 콘크리트 받침
+    for x in (0, 19): v.box(x, x + 2, 0, 3, 0, 29, '#1f6a3a')   # 기둥
+    v.box(0, 37, 1, 2, 27, 29, '#f4f6f8'); v.box(0, 37, 1, 2, 14, 14, '#1f6a3a')
+    for x in range(1, 38):
+        for z in range(3, 27):
+            if (x + z) % 3 == 0 or (x - z) % 3 == 0: v.put(x, 1, z, '#2fa84f')
     return v
 
 
-def apt_fence():                                                # 아파트 철제 담장 + 돌 받침
-    v = Vox(38, 4, 13)
-    v.box(0, 37, 0, 3, 0, 3, '#c8bca8'); v.box(0, 37, 0, 3, 3, 3, '#b0a490')
-    for x in (0, 18): v.box(x, x + 2, 0, 3, 0, 12, '#c8bca8')
-    for x in range(3, 38, 3): v.box(x, x, 1, 2, 4, 11, '#2b3440')
-    v.box(0, 37, 1, 2, 11, 11, '#2b3440'); v.box(0, 37, 1, 2, 7, 7, '#2b3440')
+def apt_fence():                                                # 아파트 담장: 생울타리 + 철제 난간 + 돌기둥
+    v = Vox(38, 8, 24)
+    v.box(0, 37, 0, 7, 0, 2, '#c8bca8')
+    for x in range(38):
+        hgt = 10 + (x * 5 % 3 == 0)
+        v.box(x, x, 3, 7, 3, hgt, '#3f8a3a' if (x // 3) % 2 else '#4f9e45')
+    for x in (0, 18): v.box(x, x + 3, 0, 4, 0, 23, '#d9cdb8'); v.box(x, x + 3, 0, 4, 23, 23, '#8a7a62')
+    for x in range(4, 38, 3): v.box(x, x, 1, 1, 3, 21, '#2b3440')
+    v.box(0, 37, 1, 1, 21, 22, '#2b3440'); v.box(0, 37, 1, 1, 12, 12, '#2b3440')
+    for x in range(5, 38, 6): v.put(x, 1, 22, '#ffd23f')
     return v
 
 

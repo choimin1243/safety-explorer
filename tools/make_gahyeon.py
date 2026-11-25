@@ -35,7 +35,7 @@ r("""  for (let y = 13; y <= 16; y++) for (let x = 72; x <= 83; x++) blocks[y * 
 # ---- 소품 ----
 r("sf.push([wx(x + 1.5), wz(34.05), 0]); sf.push([wx(x + 1.5), wz(38.95), 0]);", "sf.push([wx(x + 1.5), wz(34.05), 0]);")
 r("const sf = [];\n  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 46.5) < 4 || Math.abs(x - 70.5) < 4 || Math.abs(x - 77) < 4) continue;",
-  "const sf = [];\n  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || (x > 45 && x < 57)) continue;")
+  "const sf = [];\n  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || x < 57) continue;")
 r("prop('sign_school', 43.5, 34.1, 0, 0.3); prop('sign_30', 51, 38.9, Math.PI, 0.3); prop('cctv', 49.6, 34.1, 0, 0.3); prop('crosswalk_sign', 45.2, 38.9, Math.PI, 0.3);\n  prop('crosswalk_sign', 69.2, 34.1, 0, 0.3);",
   "prop('sign_school', 38.5, 34.1, 0, 0.3); prop('sign_30', 46, 38.9, Math.PI, 0.3); prop('cctv', 44.6, 34.1, 0, 0.3); prop('crosswalk_sign', 40.2, 38.9, Math.PI, 0.3);\n  prop('crosswalk_sign', 64.2, 34.1, 0, 0.3); prop('drop_off_sign', 51, 34.15, 0, 0.3); prop('sign_school', 23.9, 30, -Math.PI / 2, 0.3);")
 r("""  // 송명초 정문

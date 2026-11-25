@@ -320,7 +320,7 @@ function placeProps() {
   const lamps = []; for (let x = 26; x < W; x += 10) { lamps.push([wx(x), wz(34.2), Math.PI]); lamps.push([wx(x + 5), wz(38.8), 0]); }
   instanced('street_lamp', lamps);
   const sf = [];
-  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || (x > 45 && x < 57)) continue; sf.push([wx(x + 1.5), wz(34.05), 0]); }
+  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || x < 57) continue; sf.push([wx(x + 1.5), wz(34.05), 0]); }
   instanced('safety_fence', sf);
   prop('sign_school', 38.5, 34.1, 0, 0.3); prop('sign_30', 46, 38.9, Math.PI, 0.3); prop('cctv', 44.6, 34.1, 0, 0.3); prop('crosswalk_sign', 40.2, 38.9, Math.PI, 0.3);
   prop('crosswalk_sign', 64.2, 34.1, 0, 0.3); prop('drop_off_sign', 51, 34.15, 0, 0.3); prop('sign_school', 23.9, 30, -Math.PI / 2, 0.3);
