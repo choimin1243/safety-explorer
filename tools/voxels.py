@@ -2045,6 +2045,172 @@ def drop_off_sign():                                            # 승하차 구�
 save('drop_off_sign', drop_off_sign(), note='prop')
 
 
+# ---------------- 가현초편 2차: 동네 생활 소품 ----------------
+import math as _m
+
+
+def shade_canopy():                                             # 횡단보도 그늘막(접이식 큰 파라솔)
+    v = Vox(36, 36, 40)
+    v.cyl(18, 18, 1.2, 0, 30, '#9aa3ad'); v.cyl(18, 18, 3, 0, 1, '#5b626b')
+    for z in range(28, 38):
+        r = 17 * (38 - z) / 10 + 1
+        v.cyl(18, 18, r, z, z, '#2fa84f' if (z % 3) else '#25904a')
+    for a in range(0, 360, 45):
+        x = int(18 + 16 * _m.cos(_m.radians(a))); y = int(18 + 16 * _m.sin(_m.radians(a))); v.box(x, x, y, y, 26, 28, '#e8f5ea')
+    return v
+
+
+def shared_kick():                                              # 공유 전동킥보드(초록, 서 있는 것)
+    v = Vox(6, 18, 22)
+    v.wheel(2, 3, 2, 1, 1); v.wheel(2, 3, 15, 1, 1)
+    v.box(1, 4, 2, 15, 2, 2, '#2fa84f'); v.box(2, 3, 15, 16, 3, 18, '#5b626b'); v.box(0, 5, 16, 16, 19, 19, '#2b2b33')
+    v.box(2, 3, 15, 15, 14, 15, '#c8ff3a'); v.box(1, 4, 6, 10, 3, 3, '#1d2a33')
+    return v
+
+
+def bus_info():                                                 # 버스 도착 안내 전광판(BIT)
+    v = Vox(22, 6, 34)
+    v.box(2, 3, 2, 3, 0, 22, '#5b626b'); v.box(18, 19, 2, 3, 0, 22, '#5b626b')
+    v.box(0, 21, 1, 4, 22, 33, '#2b3440'); v.box(1, 20, 4, 4, 23, 32, '#101418')
+    for i, y in enumerate((30, 27, 24)):
+        v.box(2, 7, 4, 4, y, y + 1, '#ffb020', glow=True); v.box(9, 18, 4, 4, y, y + 1, ['#2cff7a', '#ffd23f', '#ff6040'][i], glow=True)
+    return v
+
+
+def bungeoppang():                                              # 붕어빵 포장마차
+    v = Vox(28, 18, 30)
+    v.wheel(2, 3, 4, 2, 2); v.wheel(24, 25, 4, 2, 2)
+    v.box(1, 26, 1, 16, 3, 12, '#e8dcc8'); v.box(1, 26, 1, 2, 3, 12, '#c8623a')
+    v.box(4, 23, 3, 10, 13, 13, '#3a3f47')
+    for x in range(5, 22, 4): v.box(x, x + 2, 4, 6, 14, 14, '#d8963a'); v.box(x, x + 2, 7, 9, 14, 14, '#c8822a')
+    for x in (1, 26): v.box(x, x, 1, 1, 13, 26, '#9aa3ad'); v.box(x, x, 16, 16, 13, 26, '#9aa3ad')
+    v.box(0, 27, 0, 17, 27, 28, '#e2463b'); v.box(0, 27, 0, 17, 26, 26, '#fff0e0')
+    v.box(7, 20, 0, 0, 21, 25, '#ffd23f'); v.box(9, 18, 0, 0, 22, 24, '#c8623a')
+    return v
+
+
+def parasol_table():                                            # 편의점 앞 파라솔 테이블
+    v = Vox(26, 26, 32)
+    v.cyl(13, 13, 5, 9, 10, '#f4f6f8'); v.cyl(13, 13, 1, 0, 9, '#9aa3ad'); v.cyl(13, 13, 0.8, 10, 26, '#9aa3ad')
+    for (x, y) in ((4, 13), (22, 13), (13, 4), (13, 22)): v.box(x - 1, x + 1, y - 1, y + 1, 0, 5, '#2f7de1')
+    for z in range(24, 30):
+        r = 12 * (30 - z) / 6 + 1
+        for yy in range(26):
+            for xx in range(26):
+                d = (xx - 13) ** 2 + (yy - 13) ** 2
+                if d <= r * r: v.put(xx, yy, z, '#ff9f1c' if int(_m.degrees(_m.atan2(yy - 13, xx - 13)) // 45) % 2 else '#ffffff')
+    return v
+
+
+def clothes_bin():                                              # 의류수거함
+    v = Vox(14, 10, 22)
+    v.box(0, 13, 0, 9, 0, 19, '#3f8f5a'); v.box(0, 13, 0, 9, 20, 21, '#2f6f45')
+    v.box(3, 10, 9, 9, 13, 16, '#2b3440'); v.box(2, 11, 9, 9, 5, 9, '#ffffff'); v.box(4, 9, 9, 9, 6, 8, '#3f8f5a')
+    return v
+
+
+def ev_charger():                                               # 전기차 충전기
+    v = Vox(10, 8, 22)
+    v.box(1, 8, 1, 6, 0, 20, '#f4f6f8'); v.box(1, 8, 1, 6, 21, 21, '#2fa84f')
+    v.box(3, 6, 6, 6, 13, 18, '#101418'); v.box(4, 5, 6, 6, 15, 16, '#2cff7a', glow=True)
+    v.box(8, 9, 3, 4, 6, 12, '#2b2b33'); v.box(9, 9, 4, 6, 2, 6, '#2b2b33')
+    return v
+
+
+def delivery_bike():                                            # 세워 둔 배달 오토바이
+    v = Vox(11, 22, 18)
+    v.wheel(4, 6, 3, 2, 2); v.wheel(4, 6, 18, 2, 2)
+    v.box(3, 7, 4, 17, 3, 6, '#2f7de1'); v.box(4, 6, 16, 18, 7, 13, '#2f7de1'); v.box(1, 9, 18, 18, 13, 14, '#2b2b33')
+    v.box(2, 8, 0, 6, 7, 14, '#ffffff'); v.box(3, 7, 0, 0, 9, 12, '#ff9f1c'); v.box(4, 6, 8, 13, 7, 8, '#2b2b33')
+    return v
+
+
+def cat():
+    v = Vox(6, 12, 8)
+    v.box(1, 4, 2, 8, 1, 3, '#f2a65a'); v.box(1, 4, 8, 11, 2, 5, '#f2a65a'); v.put(1, 11, 6, '#f2a65a'); v.put(4, 11, 6, '#f2a65a')
+    v.put(1, 11, 4, '#1d2a33'); v.put(4, 11, 4, '#1d2a33'); v.box(2, 3, 0, 1, 2, 5, '#d8823a')
+    for (x, y) in ((1, 3), (4, 3), (1, 7), (4, 7)): v.put(x, y, 0, '#ffffff')
+    for y in range(2, 8, 2): v.box(1, 4, y, y, 3, 3, '#d8823a')
+    return v
+
+
+def pigeon():
+    v = Vox(5, 7, 6)
+    v.box(1, 3, 1, 4, 1, 3, '#8a96a8'); v.box(1, 3, 4, 6, 3, 5, '#7a8698'); v.put(2, 6, 4, '#3fbf8a'); v.put(2, 6, 5, '#7a8698')
+    v.put(1, 6, 5, '#1d2a33'); v.put(3, 6, 5, '#1d2a33'); v.box(1, 3, 0, 1, 2, 2, '#5a6678'); v.put(1, 3, 0, '#e8823a'); v.put(3, 3, 0, '#e8823a')
+    return v
+
+
+def tree_cherry():                                              # 벚나무
+    v = Vox(25, 25, 40)
+    v.cyl(12, 12, 1.6, 0, 16, '#6b4a3a')
+    v.ball(12, 12, 26, 11, '#f7b6c8', rz=10); v.ball(8, 10, 31, 6, '#fbd0dc'); v.ball(16, 15, 22, 6, '#f29ab4')
+    return v
+
+
+def tree_pine():                                                # 소나무
+    v = Vox(21, 21, 44)
+    v.cyl(10, 10, 1.4, 0, 14, '#7a4a2a')
+    for z0, r in ((14, 8), (22, 7), (29, 5.5), (35, 4)):
+        for z in range(z0, z0 + 6): v.cyl(10 + (z0 % 3) - 1, 10, r - (z - z0) * 0.5, z, z, '#2f6f3a' if z % 2 else '#3a8045')
+    return v
+
+
+def hedge():                                                    # 생울타리(회양목)
+    v = Vox(32, 8, 9)
+    for x in range(32):
+        hgt = 7 + (x * 7 % 3 == 0)
+        v.box(x, x, 1, 6, 0, hgt, '#3f8a3a' if (x // 3) % 2 else '#4f9e45')
+    v.box(0, 31, 0, 7, 0, 0, '#8a6a42')
+    return v
+
+
+def banner(text_col='#2f7de1'):                                 # 현수막 '안전한 등굣길'
+    v = Vox(48, 4, 26)
+    v.box(0, 1, 1, 2, 0, 25, '#9aa3ad'); v.box(46, 47, 1, 2, 0, 25, '#9aa3ad')
+    v.box(2, 45, 2, 2, 15, 24, '#ffffff'); v.box(2, 45, 2, 2, 15, 15, text_col); v.box(2, 45, 2, 2, 24, 24, text_col)
+    for x in range(5, 43, 5): v.box(x, x + 2, 2, 2, 17, 22, '#e2463b' if x < 20 else text_col)
+    return v
+
+
+def manhole():
+    v = Vox(12, 12, 1)
+    v.cyl(6, 6, 5.5, 0, 0, '#5b626b')
+    for y in range(12):
+        for x in range(12):
+            if (x - 6) ** 2 + (y - 6) ** 2 <= 20 and (x + y) % 3 == 0: v.put(x, y, 0, '#3a3f47')
+    return v
+
+
+def kid_bike():                                                 # 세워 둔 어린이 자전거
+    v = Vox(6, 18, 14)
+    v.wheel(2, 3, 3, 3, 3); v.wheel(2, 3, 14, 3, 3)
+    v.box(2, 3, 4, 13, 6, 7, '#e2463b'); v.box(2, 3, 13, 13, 7, 12, '#9aa3ad'); v.box(0, 5, 13, 13, 12, 12, '#2b2b33'); v.box(1, 4, 5, 7, 9, 9, '#2b2b33')
+    v.box(1, 4, 15, 17, 9, 11, '#ffd23f')
+    return v
+
+
+def speed_bump():                                               # 과속방지턱
+    v = Vox(40, 10, 2)
+    for x in range(40):
+        v.box(x, x, 1, 8, 0, 1, '#ffd23f' if (x // 5) % 2 else '#ffffff')
+    return v
+
+
+def phone_booth():                                              # 비상벨 기둥(안심 비상벨)
+    v = Vox(8, 8, 34)
+    v.box(2, 5, 2, 5, 0, 26, '#ffd23f'); v.box(1, 6, 1, 6, 27, 33, '#e2463b')
+    v.box(3, 4, 6, 6, 18, 21, '#e2463b', glow=True); v.box(3, 4, 6, 6, 10, 15, '#2b3440'); v.box(1, 6, 1, 6, 30, 31, '#ffffff', glow=True)
+    return v
+
+
+for nm, fn in (('shade_canopy', shade_canopy), ('shared_kick', shared_kick), ('bus_info', bus_info), ('bungeoppang', bungeoppang),
+               ('parasol_table', parasol_table), ('clothes_bin', clothes_bin), ('ev_charger', ev_charger), ('delivery_bike', delivery_bike),
+               ('cat', cat), ('pigeon', pigeon), ('tree_cherry', tree_cherry), ('tree_pine', tree_pine), ('hedge', hedge),
+               ('banner', banner), ('manhole', manhole), ('kid_bike', kid_bike), ('speed_bump', speed_bump), ('safety_bell', phone_booth)):
+    save(nm, fn(), note='prop')
+
+
 # 소방차: 앞서 sprite-stacking 스킬로 4방향을 그려 깎은 띠를 그대로 쓴다
 _ft = Image.open(os.path.join(OUT, '..', 'assets', 'firetruck_slices.png'))
 _ft.save(os.path.join(OUT, 'firetruck.png'))
@@ -2055,5 +2221,6 @@ MANIFEST['firetruck'] = {'w': _ft.width // 24, 'l': _ft.height, 'n': 24, 'vox': 
 for nm, m in MANIFEST.items():
     im = Image.open(os.path.join(OUT, nm + '.png'))
     assert im.width == m['w'] * m['n'] and im.height == m['l'], nm
+    assert im.width <= 4096 and im.height <= 4096, ('태블릿 최대 텍스처 크기 초과', nm, im.size)
 json.dump(MANIFEST, open(os.path.join(OUT, 'manifest.json'), 'w'), ensure_ascii=False, indent=0)
 print(len(MANIFEST), 'sprites')

@@ -12,6 +12,7 @@ r("import { keys, pressed, touch, pinch, endFrame, debugPanel } from './input.js
 r("fetch('data/songmyeong_grid.json')", "fetch('../data/gahyeon_grid.json')")
 r("fetch('sprites/manifest.json')", "fetch('../sprites/manifest.json')")
 r("loader.load('sprites/' + n", "loader.load('../sprites/' + n")
+r("const names = Object.keys(MAN).filter((n) => !/^bld_gahyeon/.test(n)); let done = 0;", "const names = Object.keys(MAN).filter((n) => !/^bld_(songmyeong|cheomdan|neunghuh)/.test(n)); let done = 0;")
 r("// 송명 안전 탐험대 — 인천송명초 둘레 실제 지도(OSM)", "// 가현 안전 탐험대 — 인천가현초 둘레 실제 지도(OSM, 180도 돌려 학교가 큰길 위쪽)")
 # ---- 횡단보도 ----
 r("{ id: 'S', x0: 46, x1: 47, y0: 35, y1: 37, axis: 'v', off: 0, name: '송명초 정문 앞 횡단보도' }", "{ id: 'S', x0: 41, x1: 42, y0: 35, y1: 37, axis: 'v', off: 0, name: '가현초 정문 앞 횡단보도' }")
@@ -91,6 +92,30 @@ r("""  // ---- 첨단초 앞마당 ----
   prop('flagpoles', 51.6, 55.8, 0, 1.0); prop('statue', 44.6, 55.8, 0, 0.8); prop('garden', 41.6, 59.2, 0, 2.0); prop('pullup_bars', 54.4, 59.6, Math.PI / 2, 1.0); prop('bench', 47, 59.8, 0, 1); prop('bike_rack', 49.5, 59.8, 0, 1.2);""",
   """  // ---- 루에블리 단지 산책길 ----
   prop('garden', 52, 60.8, 0, 2.0); prop('bench', 49, 59.6, 0, 1); prop('bike_rack', 53.2, 57.4, 0, 1.2); prop('flower_bed', 44.5, 61.2, 0, 0); prop('stroller', 50.6, 62.2, 0.5, 0.4);""")
+# ---- 2차: 동네 생활 소품 ----
+r("  placeSchoolSprites();\n}", """  // ---- 동네 생활 소품 (가현초편 2차) ----
+  const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); return g; };
+  D('shade_canopy', 44.2, 38.55, 0, 0.3); D('shade_canopy', 63.4, 38.55, 0, 0.3); D('shade_canopy', 37.0, 33.75, 0, 0);
+  D('bus_info', 69.6, 33.7, 0, 0.3);
+  for (const [x, y, a] of [[76.6, 33.7, 0.2], [77.3, 33.75, -0.1], [47.4, 33.7, 0.3], [24.3, 34.4, 1.5]]) D('shared_kick', x, y, a, 0.2);
+  D('bungeoppang', 13.4, 23.2, Math.PI / 2, 1.2); label('🐟 붕어빵', wx(13.4), 4.4, wz(23.2), { bg: '#c8623a', fg: '#fff', scale: 0.55 });
+  D('parasol_table', 6.7, 33.6, 0, 1.0); D('parasol_table', 8.5, 33.6, 0.4, 1.0);
+  D('clothes_bin', 37.7, 62.5, 0, 0.5); D('clothes_bin', 10.3, 45.6, Math.PI / 2, 0.5);
+  D('ev_charger', 57.6, 62.6, 0, 0.4); D('ev_charger', 58.6, 62.6, 0, 0.4); D('car_white', 57.6, 61.5, 0, 0); D('car_blue', 58.6, 61.5, 0, 0);
+  D('delivery_bike', 16.7, 12.0, 0.2, 0.5); D('delivery_bike', 41.9, 42.8, -0.3, 0.5);
+  for (const [x, y, a] of [[26.6, 64.9, 1], [47.7, 39.4, -0.5], [8.4, 23.6, 2]]) D('cat', x, y, a, 0, 1.4);
+  for (const [x, y, a] of [[46.4, 40.7, 0], [47.0, 41.2, 2], [50.4, 39.6, 1], [45.6, 34.6, 3], [36.0, 34.6, 4]]) D('pigeon', x, y, a, 0, 1.4);
+  for (const [x, y] of [[44.0, 41.2], [52.4, 41.2], [50.8, 41.3], [37.0, 48.0], [37.2, 53.4], [48.2, 46.6]]) D('tree_cherry', x, y, hash(x, y) * 6, 0.9);
+  for (const [x, y] of [[24.5, 22.2], [24.5, 24.0], [25.2, 9.5], [25.2, 12.5], [42.5, 10.5], [42.5, 13.5], [44.6, 19.0]]) D('tree_pine', x, y, hash(y, x) * 6, 0.9);
+  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.3, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
+  D('banner', 28.2, 33.6, 0, 0.3);
+  for (const [x, y] of [[30, 34.5], [55, 38.5], [61, 34.5], [19.5, 31], [20.5, 45], [72, 38.5]]) D('manhole', x, y, 0, 0);
+  D('speed_bump', 59.5, 28.5, Math.PI / 2, 0); D('speed_bump', 55, 24.5, 0, 0); D('speed_bump', 79, 20.5, Math.PI / 2, 0);
+  for (const [x, y] of [[37.3, 47.3], [52.6, 34.4], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
+  for (const [x, y, a] of [[37.9, 31.0, 0.1], [38.5, 31.0, -0.1], [39.1, 31.0, 0]]) D('kid_bike', x, y, a, 0);
+  label('🔔 안심 비상벨', wx(37.3), 4.2, wz(47.3), { bg: '#e2463b', fg: '#fff', scale: 0.5 });
+  placeSchoolSprites();
+}""")
 # ---- 차선 ----
 r("E: { axis: 'x', dir: 1, c: 37.2, from: 23, to: 92, stops: [['S', 45.5], ['E', 69.5]] }", "E: { axis: 'x', dir: 1, c: 37.2, from: 23, to: 92, stops: [['S', 40.5], ['E', 64.5]] }")
 r("Wb: { axis: 'x', dir: -1, c: 35.8, from: 92, to: 17, stops: [['E', 72.5], ['S', 48.5]] }", "Wb: { axis: 'x', dir: -1, c: 35.8, from: 92, to: 17, stops: [['E', 67.5], ['S', 43.5]] }")

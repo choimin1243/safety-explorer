@@ -40,7 +40,7 @@ async function loadAll() {
   GRID = await (await fetch('../data/gahyeon_grid.json')).json();
   W = GRID.W; H = GRID.H;
   MAN = await (await fetch('../sprites/manifest.json')).json();
-  const names = Object.keys(MAN); let done = 0;
+  const names = Object.keys(MAN).filter((n) => !/^bld_(songmyeong|cheomdan|neunghuh)/.test(n)); let done = 0;
   const loader = new THREE.TextureLoader();
   await Promise.all(names.map((n) => new Promise((res) => loader.load('../sprites/' + n + '.png', (tex) => {
     tex.magFilter = tex.minFilter = THREE.NearestFilter; tex.generateMipmaps = false; tex.colorSpace = THREE.SRGBColorSpace;
@@ -191,35 +191,102 @@ function placeSchoolSprites() {
     const m = MAN[n]; sprite(n, wx(m.bx) + m.tw * T / 2, wz(m.by) + m.th * T / 2, 0, { shadow: false });
   }
 }
+// 건물 벽 질감: 4가지 무늬를 가로로 이어 붙이고, 칸마다 u 범위를 골라 써서 똑같아 보이지 않게
+function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.magFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const FACADE = {
+  apartments: (K) => canvasTex(128, 32, (g) => {                 // 발코니 창: 유리 · 창틀 · 난간 · 바닥 띠, 커튼/불 켜진 집
+    for (let v = 0; v < 4; v++) {
+      const o = v * 32; g.fillStyle = K.wall; g.fillRect(o, 0, 32, 32);
+      g.fillStyle = '#c9d3dc'; g.fillRect(o + 2, 3, 28, 22); g.fillStyle = K.win; g.fillRect(o + 3, 4, 26, 15);
+      g.fillStyle = ['#cfe6f5', '#ffe9a0', '#f2c6c6', '#d6ecd2'][v]; g.fillRect(o + (v % 2 ? 4 : 17), 5, 11, 13);
+      g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(o + 5, 5, 2, 9);
+      g.fillStyle = '#9aa7b3'; g.fillRect(o + 15, 4, 2, 15); g.fillRect(o + 2, 19, 28, 1);
+      g.fillStyle = 'rgba(80,95,110,.55)'; for (let x = 3; x < 30; x += 3) g.fillRect(o + x, 20, 1, 5);
+      g.fillStyle = '#7f8c98'; g.fillRect(o + 2, 25, 28, 2); g.fillStyle = 'rgba(0,0,0,.10)'; g.fillRect(o, 29, 32, 3);
+      if (v === 3) { g.fillStyle = '#a7b3bd'; g.fillRect(o + 22, 21, 6, 4); }      // 실외기
+    }
+  }),
+  commercial: (K) => canvasTex(64, 16, (g) => {
+    for (let v = 0; v < 4; v++) { const o = v * 16; g.fillStyle = K.wall; g.fillRect(o, 0, 16, 16); g.fillStyle = K.win; g.fillRect(o + 2, 3, 12, 8); g.fillStyle = K.lit; g.fillRect(o + 2, 3, 12, 2); g.fillStyle = '#8a7a5a'; g.fillRect(o + 7, 3, 2, 8); g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(o, 14, 16, 2); }
+  }),
+};
+const BASE = {     // 1층: 아파트 필로티·현관, 상가 유리 진열창
+  apartments: canvasTex(64, 16, (g) => { for (let v = 0; v < 4; v++) { const o = v * 16; g.fillStyle = '#b9b2a6'; g.fillRect(o, 0, 16, 16); g.fillStyle = v === 1 ? '#5b7f9e' : '#6d6a64'; g.fillRect(o + 3, 3, 10, 13); if (v === 1) { g.fillStyle = '#a8d8f0'; g.fillRect(o + 4, 4, 3, 11); g.fillRect(o + 9, 4, 3, 11); } g.fillStyle = '#d9d2c3'; g.fillRect(o, 0, 16, 2); } }),
+  commercial: canvasTex(64, 16, (g) => { for (let v = 0; v < 4; v++) { const o = v * 16; g.fillStyle = '#d8d2c4'; g.fillRect(o, 0, 16, 16); g.fillStyle = '#9fd0ea'; g.fillRect(o + 1, 3, 14, 13); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(o + 3, 5, 2, 8); g.fillStyle = '#5a5248'; g.fillRect(o + 7, 3, 2, 13); g.fillStyle = ['#e2463b', '#2fa84f', '#2f7de1', '#ff9f1c'][v]; g.fillRect(o, 0, 16, 3); } }),
+};
+const BAND = {     // 꼭대기: 아파트 색 띠, 상가 간판
+  apartments: (col) => canvasTex(16, 8, (g) => { g.fillStyle = col; g.fillRect(0, 0, 16, 8); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(0, 6, 16, 1); }),
+  commercial: () => canvasTex(64, 16, (g) => { const cs = ['#e2463b', '#2f7de1', '#2fa84f', '#ff9f1c']; for (let v = 0; v < 4; v++) { const o = v * 16; g.fillStyle = cs[v]; g.fillRect(o, 1, 16, 14); g.fillStyle = '#fff'; for (let x = 2; x < 14; x += 3) g.fillRect(o + x, 5, 2, 6); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(o, 14, 16, 2); } }),
+};
+const ACCENT = ['#2f6fb3', '#3f8f5a', '#c8623a', '#7a5cc8'];
 function buildBuildings() {
-  const byKind = {};
+  const groups = {}, bld = {};
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const ch = GRID.bldg[y][x]; if (ch === '.') continue;
     if (!blocks[y * W + x] || SPRITE_BLDG.includes(ch)) continue;
     const id = ch.charCodeAt(0) - 48, b = GRID.buildings[id] || { kind: 'public', levels: 3 };
-    const k = KIND[b.kind] ? b.kind : 'public', h = KIND[k].h(b.levels || 3);
-    (byKind[k] ||= []).push({ x, y, id: ch, h });
+    const k = KIND[b.kind] ? b.kind : 'public', h = KIND[k].h(b.levels || 3), acc = id % ACCENT.length;
+    const key = k === 'apartments' ? k + '|' + acc : k;
+    (groups[key] ||= { k, acc, cells: [] }).cells.push({ x, y, id: ch, h });
+    (bld[ch] ||= { k, h, b, cells: [] }).cells.push([x, y]);
   }
-  for (const [k, cells] of Object.entries(byKind)) {
-    const pos = [], nor = [], uv = [], side = [], top = [];
+  for (const { k, acc, cells } of Object.values(groups)) {
+    const fancy = k === 'apartments' || k === 'commercial';
+    const BH = k === 'apartments' ? 2.2 : k === 'commercial' ? 2.0 : 0, TB = k === 'apartments' ? 0.8 : k === 'commercial' ? 1.1 : 0;
+    const pos = [], nor = [], uv = [], L = [[], [], [], []];   // 0 벽 1 지붕 2 1층 3 꼭대기 띠
     const at = {}; cells.forEach((c) => (at[c.x + ',' + c.y] = c));
     const quad = (a, b, c, d, n, uvs, list) => { const i = pos.length / 3; pos.push(...a, ...b, ...c, ...d); for (let j = 0; j < 4; j++) nor.push(...n); uv.push(...uvs); list.push(i, i + 1, i + 2, i, i + 2, i + 3); };
     for (const c of cells) {
-      const x0 = wx(c.x), x1 = wx(c.x + 1), z0 = wz(c.y), z1 = wz(c.y + 1), h = c.h, vh = h / 2.6;
-      quad([x0, h, z0], [x0, h, z1], [x1, h, z1], [x1, h, z0], [0, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0], top);
+      const x0 = wx(c.x), x1 = wx(c.x + 1), z0 = wz(c.y), z1 = wz(c.y + 1), h = c.h;
+      quad([x0, h, z0], [x0, h, z1], [x1, h, z1], [x1, h, z0], [0, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0], L[1]);
       const nb = (dx, dy) => { const o = at[(c.x + dx) + ',' + (c.y + dy)]; return o && o.id === c.id; };
-      if (!nb(0, 1)) quad([x0, 0, z1], [x1, 0, z1], [x1, h, z1], [x0, h, z1], [0, 0, 1], [0, 0, 1, 0, 1, vh, 0, vh], side);
-      if (!nb(0, -1)) quad([x1, 0, z0], [x0, 0, z0], [x0, h, z0], [x1, h, z0], [0, 0, -1], [0, 0, 1, 0, 1, vh, 0, vh], side);
-      if (!nb(1, 0)) quad([x1, 0, z1], [x1, 0, z0], [x1, h, z0], [x1, h, z1], [1, 0, 0], [0, 0, 1, 0, 1, vh, 0, vh], side);
-      if (!nb(-1, 0)) quad([x0, 0, z0], [x0, 0, z1], [x0, h, z1], [x0, h, z0], [-1, 0, 0], [0, 0, 1, 0, 1, vh, 0, vh], side);
+      const faces = [];
+      if (!nb(0, 1)) faces.push([[x0, z1], [x1, z1], [0, 0, 1]]);
+      if (!nb(0, -1)) faces.push([[x1, z0], [x0, z0], [0, 0, -1]]);
+      if (!nb(1, 0)) faces.push([[x1, z1], [x1, z0], [1, 0, 0]]);
+      if (!nb(-1, 0)) faces.push([[x0, z0], [x0, z1], [-1, 0, 0]]);
+      faces.forEach(([[ax, az], [bx, bz], n], fi) => {
+        const v = (hash(c.x * 3 + fi, c.y * 5) * 4) | 0, u0 = fancy ? v / 4 : 0, u1 = fancy ? (v + 1) / 4 : 1;
+        const part = (y0, y1, list, vv) => quad([ax, y0, az], [bx, y0, bz], [bx, y1, bz], [ax, y1, az], n, [u0, 0, u1, 0, u1, vv, u0, vv], list);
+        if (BH) part(0, BH, L[2], 1);
+        part(BH, h - TB, L[0], (h - TB - BH) / 2.6);
+        if (TB) part(h - TB, h, L[3], 1);
+      });
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    g.setIndex([...side, ...top]); g.addGroup(0, side.length, 0); g.addGroup(side.length, top.length, 1);
+    const idx = []; let off = 0; L.forEach((l, i) => { if (l.length) g.addGroup(off, l.length, i); off += l.length; idx.push(...l); }); g.setIndex(idx);
     const K = KIND[k];
-    const mesh = new THREE.Mesh(g, [stMat({ map: windowTex(K.wall, K.win, K.lit) }), stMat({ color: K.roof })]);
-    mesh.castShadow = true; mesh.receiveShadow = true; scene.add(mesh);
+    const mats = [stMat({ map: (FACADE[k] || ((K) => windowTex(K.wall, K.win, K.lit)))(K) }), stMat({ color: K.roof }),
+      stMat({ map: BASE[k] || windowTex(K.wall, K.win, K.lit) }), stMat({ map: k === 'apartments' ? BAND.apartments(ACCENT[acc]) : (BAND[k] || (() => windowTex(K.wall, K.win, K.lit)))() })];
+    const mesh = new THREE.Mesh(g, mats); mesh.castShadow = true; mesh.receiveShadow = true; scene.add(mesh);
   }
+  // 옥상(엘리베이터 기계실 · 물탱크 · 실외기)과 동 번호 판
+  const boxes = [], tanks = [];
+  for (const [ch, B] of Object.entries(bld)) {
+    if (B.cells.length < 3) continue;
+    const xs = B.cells.map((c) => c[0]), ys = B.cells.map((c) => c[1]);
+    const cx = (Math.min(...xs) + Math.max(...xs) + 1) / 2, cy = (Math.min(...ys) + Math.max(...ys) + 1) / 2;
+    const has = (x, y) => B.cells.some((c) => c[0] === (x | 0) && c[1] === (y | 0));
+    const sx = has(cx, cy) ? cx : B.cells[B.cells.length >> 1][0] + 0.5, sy = has(cx, cy) ? cy : B.cells[B.cells.length >> 1][1] + 0.5;
+    if (B.k === 'apartments') { boxes.push([wx(sx), B.h, wz(sy), 2.6, 2.0, 2.2, 0xdfe3e6]); tanks.push([wx(sx) + 2.2, B.h, wz(sy) - 0.6]); boxes.push([wx(sx) - 2.4, B.h, wz(sy) + 0.6, 1.2, 0.8, 0.9, 0xb8c0c8]); }
+    else if (B.k === 'commercial') { boxes.push([wx(sx), B.h, wz(sy), 1.4, 0.9, 1.0, 0xc8ced4]); }
+    const nm = (B.b.name || '').replace(/동$/, '');
+    if (B.k === 'apartments' && /^\d{3,4}$/.test(nm)) {                         // 남쪽(화면 앞) 벽 꼭대기에 '801동'
+      const maxY = Math.max(...ys), row = B.cells.filter((c) => c[1] === maxY).map((c) => c[0]).sort((a, b) => a - b);
+      const px = wx(row[row.length >> 1] + 0.5), pz = wz(maxY + 1) + 0.04;
+      const t = canvasTex(64, 24, (g) => { g.fillStyle = '#ffffff'; g.font = 'bold 20px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(nm + '동', 32, 13); });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.2), new THREE.MeshBasicMaterial({ map: t, transparent: true })); m.position.set(px, B.h - 0.4, pz); scene.add(m);
+    }
+  }
+  const boxGeo = new THREE.BoxGeometry(1, 1, 1); boxGeo.translate(0, 0.5, 0);
+  if (boxes.length) { const im = new THREE.InstancedMesh(boxGeo, new THREE.MeshLambertMaterial(), boxes.length), o = new THREE.Object3D(), col = new THREE.Color();
+    boxes.forEach(([x, y, z, sx, sy, sz, c], i) => { o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, col.set(c)); }); im.castShadow = true; scene.add(im); }
+  if (tanks.length) { const tg = new THREE.CylinderGeometry(0.8, 0.8, 1.3, 10); tg.translate(0, 0.65, 0); const im = new THREE.InstancedMesh(tg, new THREE.MeshLambertMaterial({ color: 0x5b8fc8 }), tanks.length), o = new THREE.Object3D();
+    tanks.forEach(([x, y, z], i) => { o.position.set(x, y, z); o.updateMatrix(); im.setMatrixAt(i, o.matrix); }); scene.add(im); }
 }
 // ---------- 이름표 ----------
 function label(text, x, y, z, { bg = '#ffffff', fg = '#1d2a33', scale = 1 } = {}) {
@@ -332,6 +399,27 @@ function placeProps() {
   for (const n of pn) instanced(n, parked[n]);
   // ---- 루에블리 단지 산책길 ----
   prop('garden', 52, 60.8, 0, 2.0); prop('bench', 49, 59.6, 0, 1); prop('bike_rack', 53.2, 57.4, 0, 1.2); prop('flower_bed', 44.5, 61.2, 0, 0); prop('stroller', 50.6, 62.2, 0.5, 0.4);
+  // ---- 동네 생활 소품 (가현초편 2차) ----
+  const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); return g; };
+  D('shade_canopy', 44.2, 38.55, 0, 0.3); D('shade_canopy', 63.4, 38.55, 0, 0.3); D('shade_canopy', 37.0, 33.75, 0, 0);
+  D('bus_info', 69.6, 33.7, 0, 0.3);
+  for (const [x, y, a] of [[76.6, 33.7, 0.2], [77.3, 33.75, -0.1], [47.4, 33.7, 0.3], [24.3, 34.4, 1.5]]) D('shared_kick', x, y, a, 0.2);
+  D('bungeoppang', 13.4, 23.2, Math.PI / 2, 1.2); label('🐟 붕어빵', wx(13.4), 4.4, wz(23.2), { bg: '#c8623a', fg: '#fff', scale: 0.55 });
+  D('parasol_table', 6.7, 33.6, 0, 1.0); D('parasol_table', 8.5, 33.6, 0.4, 1.0);
+  D('clothes_bin', 37.7, 62.5, 0, 0.5); D('clothes_bin', 10.3, 45.6, Math.PI / 2, 0.5);
+  D('ev_charger', 57.6, 62.6, 0, 0.4); D('ev_charger', 58.6, 62.6, 0, 0.4); D('car_white', 57.6, 61.5, 0, 0); D('car_blue', 58.6, 61.5, 0, 0);
+  D('delivery_bike', 16.7, 12.0, 0.2, 0.5); D('delivery_bike', 41.9, 42.8, -0.3, 0.5);
+  for (const [x, y, a] of [[26.6, 64.9, 1], [47.7, 39.4, -0.5], [8.4, 23.6, 2]]) D('cat', x, y, a, 0, 1.4);
+  for (const [x, y, a] of [[46.4, 40.7, 0], [47.0, 41.2, 2], [50.4, 39.6, 1], [45.6, 34.6, 3], [36.0, 34.6, 4]]) D('pigeon', x, y, a, 0, 1.4);
+  for (const [x, y] of [[44.0, 41.2], [52.4, 41.2], [50.8, 41.3], [37.0, 48.0], [37.2, 53.4], [48.2, 46.6]]) D('tree_cherry', x, y, hash(x, y) * 6, 0.9);
+  for (const [x, y] of [[24.5, 22.2], [24.5, 24.0], [25.2, 9.5], [25.2, 12.5], [42.5, 10.5], [42.5, 13.5], [44.6, 19.0]]) D('tree_pine', x, y, hash(y, x) * 6, 0.9);
+  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.3, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
+  D('banner', 28.2, 33.6, 0, 0.3);
+  for (const [x, y] of [[30, 34.5], [55, 38.5], [61, 34.5], [19.5, 31], [20.5, 45], [72, 38.5]]) D('manhole', x, y, 0, 0);
+  D('speed_bump', 59.5, 28.5, Math.PI / 2, 0); D('speed_bump', 55, 24.5, 0, 0); D('speed_bump', 79, 20.5, Math.PI / 2, 0);
+  for (const [x, y] of [[37.3, 47.3], [52.6, 34.4], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
+  for (const [x, y, a] of [[37.9, 31.0, 0.1], [38.5, 31.0, -0.1], [39.1, 31.0, 0]]) D('kid_bike', x, y, a, 0);
+  label('🔔 안심 비상벨', wx(37.3), 4.2, wz(47.3), { bg: '#e2463b', fg: '#fff', scale: 0.5 });
   placeSchoolSprites();
 }
 const cwNear = (x, y) => CW.some((c) => x >= c.x0 - 2 && x <= c.x1 + 2 && y >= c.y0 - 2 && y <= c.y1 + 2);
