@@ -335,6 +335,20 @@
 "vox": 0.075,
 "note": "person"
 },
+"barista_0": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
+"barista_1": {
+"w": 13,
+"l": 11,
+"n": 27,
+"vox": 0.075,
+"note": "person"
+},
 "kid_helmet_0": {
 "w": 13,
 "l": 11,
@@ -1732,6 +1746,48 @@
 "w": 8,
 "l": 8,
 "n": 34,
+"vox": 0.12,
+"note": "prop"
+},
+"school_fence": {
+"w": 38,
+"l": 3,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"apt_fence": {
+"w": 38,
+"l": 4,
+"n": 13,
+"vox": 0.12,
+"note": "prop"
+},
+"cake_case": {
+"w": 30,
+"l": 12,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"cafe_set": {
+"w": 26,
+"l": 14,
+"n": 14,
+"vox": 0.12,
+"note": "prop"
+},
+"hot_cup": {
+"w": 10,
+"l": 10,
+"n": 16,
+"vox": 0.12,
+"note": "prop"
+},
+"menu_wall": {
+"w": 30,
+"l": 2,
+"n": 16,
 "vox": 0.12,
 "note": "prop"
 },

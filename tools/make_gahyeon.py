@@ -33,6 +33,7 @@ r("const SPRITE_BLDG = ['b', 'c', '\\x92'];", "const SPRITE_BLDG = ['b', 'c', 'm
 r("""  for (let y = 13; y <= 16; y++) for (let x = 72; x <= 83; x++) blocks[y * W + x] = 1;      // 능허대중 교사 (OSM에 모양 없음)
   for (const n of ['bld_songmyeong', 'bld_songmyeong_gym', 'bld_cheomdan', 'bld_neunghuh']) {""", """  for (const n of ['bld_gahyeon', 'bld_gahyeon_gym', 'bld_gahyeon_mid']) {""")
 # ---- 소품 ----
+r("sf.push([wx(x + 1.5), wz(34.05), 0]); sf.push([wx(x + 1.5), wz(38.95), 0]);", "sf.push([wx(x + 1.5), wz(34.05), 0]);")
 r("const sf = [];\n  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 46.5) < 4 || Math.abs(x - 70.5) < 4 || Math.abs(x - 77) < 4) continue;",
   "const sf = [];\n  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || (x > 45 && x < 57)) continue;")
 r("prop('sign_school', 43.5, 34.1, 0, 0.3); prop('sign_30', 51, 38.9, Math.PI, 0.3); prop('cctv', 49.6, 34.1, 0, 0.3); prop('crosswalk_sign', 45.2, 38.9, Math.PI, 0.3);\n  prop('crosswalk_sign', 69.2, 34.1, 0, 0.3);",
@@ -72,7 +73,7 @@ r("[[45, 38.6], [48, 38.6], [69, 38.6], [72, 38.6], [45, 34.4], [48, 34.4]]", "[
 old_yard = s[s.index("  // ---- 송명초 운동장 ----"):s.index("  // ---- 정문 앞 옐로카펫")]
 r(old_yard, """  // ---- 가현초 운동장 (본관 북쪽) ----
   prop('stage', 31, 25.3, Math.PI, 2.2); prop('flagpoles', 25.2, 25.2, 0, 1.0); prop('statue', 36.9, 25.3, 0, 0.8);
-  prop('bleachers', 28.5, 17.6, Math.PI, 0); prop('bleachers', 33.5, 17.6, Math.PI, 0); for (let x = 26.5; x <= 35.5; x += 1) colliders.push({ x: wx(x), z: wz(17.5), r: 1.0 });
+  prop('bleachers', 28.5, 18.5, Math.PI, 0); prop('bleachers', 33.5, 18.5, Math.PI, 0); for (let x = 26.5; x <= 35.5; x += 1) colliders.push({ x: wx(x), z: wz(18.4), r: 1.0 });
   prop('pullup_bars', 24.8, 19.6, Math.PI / 2, 1.0); prop('jungle_gym', 41.5, 29.6, 0, 1.6); prop('garden', 25.8, 29.2, 0, 2.0); prop('pavilion', 43.4, 26.4, 0, 2.0);
   prop('shoe_rack', 35.6, 32.2, 0, 0.8); prop('bike_rack', 36.8, 30.4, 0, 1.2); prop('school_bus', 44.2, 30.8, Math.PI, 0); colliders.push({ x: wx(44.2), z: wz(30), r: 1.2 }, { x: wx(44.2), z: wz(31.6), r: 1.2 });
   for (const [x, y] of [[25.3, 18.9], [36.7, 18.9], [25.3, 24.3], [36.7, 24.3]]) prop('track_marker', x, y, 0, 0.2);
@@ -96,7 +97,7 @@ r("""  // ---- 첨단초 앞마당 ----
 r("  placeSchoolSprites();\n}", """  // ---- 동네 생활 소품 (가현초편 2차) ----
   const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); return g; };
   D('shade_canopy', 44.2, 38.55, 0, 0.3); D('shade_canopy', 63.4, 38.55, 0, 0.3); D('shade_canopy', 37.0, 33.75, 0, 0);
-  D('bus_info', 69.6, 33.7, 0, 0.3);
+  D('bus_info', 69.6, 33.55, 0, 0.3);
   for (const [x, y, a] of [[76.6, 33.7, 0.2], [77.3, 33.75, -0.1], [47.4, 33.7, 0.3], [24.3, 34.4, 1.5]]) D('shared_kick', x, y, a, 0.2);
   D('bungeoppang', 13.4, 23.2, Math.PI / 2, 1.2); label('🐟 붕어빵', wx(13.4), 4.4, wz(23.2), { bg: '#c8623a', fg: '#fff', scale: 0.55 });
   D('parasol_table', 6.7, 33.6, 0, 1.0); D('parasol_table', 8.5, 33.6, 0.4, 1.0);
@@ -107,13 +108,21 @@ r("  placeSchoolSprites();\n}", """  // ---- 동네 생활 소품 (가현초편 
   for (const [x, y, a] of [[46.4, 40.7, 0], [47.0, 41.2, 2], [50.4, 39.6, 1], [45.6, 34.6, 3], [36.0, 34.6, 4]]) D('pigeon', x, y, a, 0, 1.4);
   for (const [x, y] of [[44.0, 41.2], [52.4, 41.2], [50.8, 41.3], [37.0, 48.0], [37.2, 53.4], [48.2, 46.6]]) D('tree_cherry', x, y, hash(x, y) * 6, 0.9);
   for (const [x, y] of [[24.5, 22.2], [24.5, 24.0], [25.2, 9.5], [25.2, 12.5], [42.5, 10.5], [42.5, 13.5], [44.6, 19.0]]) D('tree_pine', x, y, hash(y, x) * 6, 0.9);
-  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.3, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
+  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.7, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
   D('banner', 28.2, 33.6, 0, 0.3);
   for (const [x, y] of [[30, 34.5], [55, 38.5], [61, 34.5], [19.5, 31], [20.5, 45], [72, 38.5]]) D('manhole', x, y, 0, 0);
   D('speed_bump', 59.5, 28.5, Math.PI / 2, 0); D('speed_bump', 55, 24.5, 0, 0); D('speed_bump', 79, 20.5, Math.PI / 2, 0);
   for (const [x, y] of [[37.3, 47.3], [52.6, 34.4], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
   for (const [x, y, a] of [[37.9, 31.0, 0.1], [38.5, 31.0, -0.1], [39.1, 31.0, 0]]) D('kid_bike', x, y, a, 0);
   label('🔔 안심 비상벨', wx(37.3), 4.2, wz(47.3), { bg: '#e2463b', fg: '#fff', scale: 0.5 });
+  // ---- 담장: 가현초 울타리(정문만 열림) · 큰길 쪽 아파트 담장(횡단보도·정류장·산책길·미션 자리는 틈) ----
+  const sfence = [], afence = [], fpost = (x, y) => colliders.push({ x: wx(x), z: wz(y), r: 0.3 });
+  const segX = (list, x0, x1, y) => { for (let x = x0; x < x1; x++) { list.push([wx(x + 0.5), wz(y), 0]); for (let k = 0; k <= 4; k++) fpost(x + k / 4, y); } };
+  const segY = (list, y0, y1, x) => { for (let y = y0; y < y1; y++) { list.push([wx(x), wz(y + 0.5), Math.PI / 2]); for (let k = 0; k <= 4; k++) fpost(x, y + k / 4); } };
+  segX(sfence, 24, 39, 33.95); segY(sfence, 18, 34, 24.0); segY(sfence, 18, 34, 46.0); segX(sfence, 24, 46, 17.95);
+  segX(afence, 24, 37, 39.05); segX(afence, 47, 53, 39.05); segX(afence, 76, 89, 39.05);
+  segX(afence, 46, 57, 33.95);
+  instanced('school_fence', sfence); instanced('apt_fence', afence);
   placeSchoolSprites();
 }""")
 # ---- 차선 ----
@@ -165,6 +174,7 @@ r("gym: { name: '🏀 송명초 체육관', ox: -150, oy: 140, w: 11, h: 7, floo
 r("nurse: { name: '🩹 송명초 보건실', ox: -150, oy: 160, w: 8, h: 6, floor: '#eef2f0', wall: '#ffffff', door: [42.2, 21.6],", "nurse: { name: '🩹 가현초 보건실', ox: -150, oy: 160, w: 8, h: 6, floor: '#eef2f0', wall: '#ffffff', door: [34.4, 33.3],")
 r("cafe: { name: '🍚 송명초 급식실', ox: -150, oy: 180, w: 11, h: 7, floor: '#e8eef2', wall: '#fffaf0', door: [50.2, 19.5],", "cafe: { name: '🍚 가현초 급식실', ox: -150, oy: 180, w: 11, h: 7, floor: '#e8eef2', wall: '#fffaf0', door: [35.6, 26.6],")
 r("acad: { name: '✏️ 송명 학원', ox: -150, oy: 200, w: 8, h: 6, floor: '#e4e0d8', wall: '#fbf7ef', door: [23.0, 22.6],", "acad: { name: '✏️ 가현 학원', ox: -150, oy: 200, w: 8, h: 6, floor: '#e4e0d8', wall: '#fbf7ef', door: [16.9, 28.6],")
+r("coffee: { name: '☕ 동네 커피숍', ox: -150, oy: 220, w: 9, h: 6, floor: '#d8c3a0', wall: '#f4efe4', door: [22.9, 19.4],", "coffee: { name: '☕ 가현 커피숍', ox: -150, oy: 220, w: 9, h: 6, floor: '#d8c3a0', wall: '#f4efe4', door: [16.9, 26.4],")
 r("function exitRoom() { const R = ROOMS[player.room]; player.tx = R.door[0]; player.ty = R.door[1] + 0.9;", "function exitRoom() { const R = ROOMS[player.room]; [player.tx, player.ty] = R.exit || [R.door[0], R.door[1] + 0.9];")
 # ---- 시작 ----
 r("sprite('grandma_0', wx(59.4), wz(45.8), Math.PI / 2);", "sprite('grandma_0', wx(59.4), wz(45.8), Math.PI / 2);")

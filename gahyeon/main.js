@@ -320,7 +320,7 @@ function placeProps() {
   const lamps = []; for (let x = 26; x < W; x += 10) { lamps.push([wx(x), wz(34.2), Math.PI]); lamps.push([wx(x + 5), wz(38.8), 0]); }
   instanced('street_lamp', lamps);
   const sf = [];
-  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || (x > 45 && x < 57)) continue; sf.push([wx(x + 1.5), wz(34.05), 0]); sf.push([wx(x + 1.5), wz(38.95), 0]); }
+  for (let x = 24; x < W - 2; x += 3) { if (Math.abs(x - 41.5) < 4 || Math.abs(x - 65.5) < 4 || Math.abs(x - 72) < 4 || (x > 45 && x < 57)) continue; sf.push([wx(x + 1.5), wz(34.05), 0]); }
   instanced('safety_fence', sf);
   prop('sign_school', 38.5, 34.1, 0, 0.3); prop('sign_30', 46, 38.9, Math.PI, 0.3); prop('cctv', 44.6, 34.1, 0, 0.3); prop('crosswalk_sign', 40.2, 38.9, Math.PI, 0.3);
   prop('crosswalk_sign', 64.2, 34.1, 0, 0.3); prop('drop_off_sign', 51, 34.15, 0, 0.3); prop('sign_school', 23.9, 30, -Math.PI / 2, 0.3);
@@ -371,7 +371,7 @@ function placeProps() {
   [[40, 38.6], [43, 38.6], [64, 38.6], [67, 38.6], [40, 34.4], [43, 34.4], [46, 34.4], [56, 34.4]].forEach(([x, y]) => prop('bollard', x, y, 0, 0.25));
   // ---- 가현초 운동장 (본관 북쪽) ----
   prop('stage', 31, 25.3, Math.PI, 2.2); prop('flagpoles', 25.2, 25.2, 0, 1.0); prop('statue', 36.9, 25.3, 0, 0.8);
-  prop('bleachers', 28.5, 17.6, Math.PI, 0); prop('bleachers', 33.5, 17.6, Math.PI, 0); for (let x = 26.5; x <= 35.5; x += 1) colliders.push({ x: wx(x), z: wz(17.5), r: 1.0 });
+  prop('bleachers', 28.5, 18.5, Math.PI, 0); prop('bleachers', 33.5, 18.5, Math.PI, 0); for (let x = 26.5; x <= 35.5; x += 1) colliders.push({ x: wx(x), z: wz(18.4), r: 1.0 });
   prop('pullup_bars', 24.8, 19.6, Math.PI / 2, 1.0); prop('jungle_gym', 41.5, 29.6, 0, 1.6); prop('garden', 25.8, 29.2, 0, 2.0); prop('pavilion', 43.4, 26.4, 0, 2.0);
   prop('shoe_rack', 35.6, 32.2, 0, 0.8); prop('bike_rack', 36.8, 30.4, 0, 1.2); prop('school_bus', 44.2, 30.8, Math.PI, 0); colliders.push({ x: wx(44.2), z: wz(30), r: 1.2 }, { x: wx(44.2), z: wz(31.6), r: 1.2 });
   for (const [x, y] of [[25.3, 18.9], [36.7, 18.9], [25.3, 24.3], [36.7, 24.3]]) prop('track_marker', x, y, 0, 0.2);
@@ -402,7 +402,7 @@ function placeProps() {
   // ---- 동네 생활 소품 (가현초편 2차) ----
   const D = (n, x, y, rot = 0, c = 0, sc = 1) => { const g = sprite(n, wx(x), wz(y), rot, { shadow: false, scale: sc }); if (c) colliders.push({ x: g.position.x, z: g.position.z, r: c }); return g; };
   D('shade_canopy', 44.2, 38.55, 0, 0.3); D('shade_canopy', 63.4, 38.55, 0, 0.3); D('shade_canopy', 37.0, 33.75, 0, 0);
-  D('bus_info', 69.6, 33.7, 0, 0.3);
+  D('bus_info', 69.6, 33.55, 0, 0.3);
   for (const [x, y, a] of [[76.6, 33.7, 0.2], [77.3, 33.75, -0.1], [47.4, 33.7, 0.3], [24.3, 34.4, 1.5]]) D('shared_kick', x, y, a, 0.2);
   D('bungeoppang', 13.4, 23.2, Math.PI / 2, 1.2); label('🐟 붕어빵', wx(13.4), 4.4, wz(23.2), { bg: '#c8623a', fg: '#fff', scale: 0.55 });
   D('parasol_table', 6.7, 33.6, 0, 1.0); D('parasol_table', 8.5, 33.6, 0.4, 1.0);
@@ -413,13 +413,21 @@ function placeProps() {
   for (const [x, y, a] of [[46.4, 40.7, 0], [47.0, 41.2, 2], [50.4, 39.6, 1], [45.6, 34.6, 3], [36.0, 34.6, 4]]) D('pigeon', x, y, a, 0, 1.4);
   for (const [x, y] of [[44.0, 41.2], [52.4, 41.2], [50.8, 41.3], [37.0, 48.0], [37.2, 53.4], [48.2, 46.6]]) D('tree_cherry', x, y, hash(x, y) * 6, 0.9);
   for (const [x, y] of [[24.5, 22.2], [24.5, 24.0], [25.2, 9.5], [25.2, 12.5], [42.5, 10.5], [42.5, 13.5], [44.6, 19.0]]) D('tree_pine', x, y, hash(y, x) * 6, 0.9);
-  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.3, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
+  for (const x of [26.4, 30.6, 34.8]) D('hedge', x, 39.7, 0, 0); for (const x of [41.6, 50.8]) D('hedge', x, 61.6, 0, 0);
   D('banner', 28.2, 33.6, 0, 0.3);
   for (const [x, y] of [[30, 34.5], [55, 38.5], [61, 34.5], [19.5, 31], [20.5, 45], [72, 38.5]]) D('manhole', x, y, 0, 0);
   D('speed_bump', 59.5, 28.5, Math.PI / 2, 0); D('speed_bump', 55, 24.5, 0, 0); D('speed_bump', 79, 20.5, Math.PI / 2, 0);
   for (const [x, y] of [[37.3, 47.3], [52.6, 34.4], [47.6, 56.0], [16.8, 33.5]]) D('safety_bell', x, y, 0, 0.3);
   for (const [x, y, a] of [[37.9, 31.0, 0.1], [38.5, 31.0, -0.1], [39.1, 31.0, 0]]) D('kid_bike', x, y, a, 0);
   label('🔔 안심 비상벨', wx(37.3), 4.2, wz(47.3), { bg: '#e2463b', fg: '#fff', scale: 0.5 });
+  // ---- 담장: 가현초 울타리(정문만 열림) · 큰길 쪽 아파트 담장(횡단보도·정류장·산책길·미션 자리는 틈) ----
+  const sfence = [], afence = [], fpost = (x, y) => colliders.push({ x: wx(x), z: wz(y), r: 0.3 });
+  const segX = (list, x0, x1, y) => { for (let x = x0; x < x1; x++) { list.push([wx(x + 0.5), wz(y), 0]); for (let k = 0; k <= 4; k++) fpost(x + k / 4, y); } };
+  const segY = (list, y0, y1, x) => { for (let y = y0; y < y1; y++) { list.push([wx(x), wz(y + 0.5), Math.PI / 2]); for (let k = 0; k <= 4; k++) fpost(x, y + k / 4); } };
+  segX(sfence, 24, 39, 33.95); segY(sfence, 18, 34, 24.0); segY(sfence, 18, 34, 46.0); segX(sfence, 24, 46, 17.95);
+  segX(afence, 24, 37, 39.05); segX(afence, 47, 53, 39.05); segX(afence, 76, 89, 39.05);
+  segX(afence, 46, 57, 33.95);
+  instanced('school_fence', sfence); instanced('apt_fence', afence);
   placeSchoolSprites();
 }
 const cwNear = (x, y) => CW.some((c) => x >= c.x0 - 2 && x <= c.x1 + 2 && y >= c.y0 - 2 && y <= c.y1 + 2);
@@ -580,8 +588,10 @@ function updatePlayer(dt) {
   } else if (v > 0.05) {
     player.face = Math.atan2(mx, mz);
     const step = v * dt / T, dx = Math.sin(player.face) * step, dy = Math.cos(player.face) * step;
-    if (!blockedAt(player.tx + dx, player.ty)) player.tx += dx;
-    if (!blockedAt(player.tx, player.ty + dy)) player.ty += dy;
+    const bx = blockedAt(player.tx + dx, player.ty), by = blockedAt(player.tx, player.ty + dy);
+    if (!bx) player.tx += dx;
+    if (!by) player.ty += dy;
+    if ((by && Math.abs(dy) >= Math.abs(dx)) || (bx && Math.abs(dx) > Math.abs(dy))) bumpBuilding(dt); else bump.t = 0;
     player.walk += v * dt;
   }
   const g = player.g; g.position.set(wx(player.tx), player.lift || 0, wz(player.ty));
@@ -961,6 +971,19 @@ const ROOMS = {
       { spr: 'exit_sign_blocked', x: 0.3, y: 2.4, r: Math.PI / 2, sc: 1.6, name: '비상구를 막은 의자', why: '불이 나면 비상구로 나가야 해요. 비상구 앞은 늘 비워요.' },
       { spr: 'heater', x: 7.4, y: 4.4, sc: 1.5, name: '난로 옆 종이', why: '난로 가까이 종이·옷을 두면 불이 붙어요.' },
       { spr: 'multitap', x: 3.6, y: 0.9, sc: 1.5, name: '문어발 콘센트', why: '플러그를 많이 꽂으면 뜨거워져 불이 날 수 있어요.' }] } },
+  coffee: { name: '☕ 가현 커피숍', ox: -150, oy: 220, w: 9, h: 6, floor: '#d8c3a0', wall: '#f4efe4', door: [16.9, 26.4], npc: ['barista', 'barista_0', 5.2, 1.4],
+    talk: [{ who: 'barista', say: '어서 오세요! 여기는 어른들이 커피를 마시는 곳이지만, 어린이 음료도 있어요.' },
+      { who: 'barista', ask: '뜨거운 음료를 쏟아 손을 데었어요. 어떻게 할까요?', choices: [
+        { t: '흐르는 시원한 물에 15분쯤 식히고 어른에게 알린다', ok: true, why: '맞아요! 찬물로 열을 식혀요. 얼음을 바로 대거나 물집을 터뜨리면 안 돼요.' },
+        { t: '얼음을 덴 곳에 바로 꾹 누른다', why: '얼음은 피부를 더 상하게 할 수 있어요. 흐르는 시원한 물로 식혀요.' },
+        { t: '된장이나 치약을 바른다', why: '세균이 들어가 덧날 수 있어요. 물로 식히고 병원에 가요.' }] },
+      { who: 'barista', ask: '커피처럼 카페인이 많은 음료는 어린이가 마셔도 될까요?', choices: [
+        { t: '잠이 안 오고 가슴이 두근거릴 수 있어서 마시지 않는다', ok: true, why: '맞아요! 어린이는 우유·과일 음료나 물을 골라요.' },
+        { t: '어른처럼 매일 마시면 키가 큰다', why: '카페인은 키를 크게 하지 않아요. 잠을 방해해요.' }] }],
+    task: { mode: 'hunt', title: '커피숍에서 위험한 것 찾기', items: [
+      { spr: 'hot_cup', x: 2.9, y: 3.7, sc: 1.6, name: '탁자 끝의 뜨거운 커피', why: '탁자 끝 뜨거운 컵은 팔에 걸려 쏟아져요. 안쪽으로 밀어 두어요.' },
+      { spr: 'puddle', x: 6.8, y: 4.6, sc: 1.4, name: '쏟은 음료', why: '바닥이 미끄러워요. 직원에게 알려요.' },
+      { spr: 'cable_floor', x: 1.2, y: 5.0, sc: 1.4, name: '바닥을 지나는 충전기 줄', why: '줄에 걸려 넘어질 수 있어요. 조심해서 돌아가요.' }] } },
 };
 ROOMS.class.task = { mode: 'hunt', title: '교실에서 위험한 것 찾기', items: [
   { spr: 'bag_floor', x: 4.95, y: 4.0, sc: 1.4, name: '통로의 책가방', why: '통로에 둔 가방에 걸려 넘어질 수 있어요. 책상 옆 고리에 걸어요.' },
@@ -976,7 +999,7 @@ ROOMS.snack.task = { mode: 'hunt', title: '분식집에서 위험한 것 찾기'
   { spr: 'puddle', x: 1.8, y: 1.9, sc: 1.3, name: '쏟은 국물', why: '바닥에 쏟은 국물은 미끄럽고 뜨거워요. 어른에게 알려요.' }] };
 Object.values(ROOMS).forEach((R, i) => { R.oy = i * 40; });   // 방끼리 멀리 떨어뜨려 옆 방이 안 보이게
 NAMES.pe_teacher = '체육 선생님'; NAMES.nurse = '보건 선생님'; NAMES.cook = '조리사님'; NAMES.tutor = '학원 선생님'; NAMES.pharmacist = '약사 선생님'; NAMES.master = '태권도 관장님'; NAMES.scientist = '과학 선생님';
-NAMES.clerk = '편의점 점원'; NAMES.owner = '분식집 사장님';
+NAMES.clerk = '편의점 점원'; NAMES.owner = '분식집 사장님'; NAMES.barista = '바리스타';
 const badges = new Set();
 function roomTex(id, kind, R) {
   const c = document.createElement('canvas'); const g = c.getContext('2d');
@@ -993,10 +1016,10 @@ function roomTex(id, kind, R) {
   } else {
     const ww = kind === 'back' ? R.w : R.h; c.width = ww * 32; c.height = 48;
     g.fillStyle = R.wall; g.fillRect(0, 0, c.width, 48);
-    g.fillStyle = { class: '#9bb5a0', conv: '#2f7de1', pharm: '#2fa84f', tkd: '#d8483b', apt: '#a89880', sci: '#5b7f9e', gym: '#2f5fb3', nurse: '#ff9fb8', cafe: '#ff9f1c', acad: '#8e5cd9' }[id] || '#e2463b'; g.fillRect(0, 36, c.width, 12);      // 걸레받이·띠
+    g.fillStyle = { class: '#9bb5a0', conv: '#2f7de1', coffee: '#6b4a2a', pharm: '#2fa84f', tkd: '#d8483b', apt: '#a89880', sci: '#5b7f9e', gym: '#2f5fb3', nurse: '#ff9fb8', cafe: '#ff9f1c', acad: '#8e5cd9' }[id] || '#e2463b'; g.fillRect(0, 36, c.width, 12);      // 걸레받이·띠
     if (kind === 'side' && id === 'tkd') { g.fillStyle = '#cfe8f5'; g.fillRect(8, 6, c.width - 16, 28); g.fillStyle = 'rgba(255,255,255,.7)'; for (let x = 20; x < c.width; x += 40) g.fillRect(x, 8, 6, 24); }   // 거울
     if (kind === 'back' && (id === 'tkd' || id === 'pharm')) { g.fillStyle = id === 'tkd' ? '#1d1a1a' : '#2fa84f'; g.font = 'bold 10px sans-serif'; g.textAlign = 'center'; g.fillText(id === 'tkd' ? '예의 · 염치 · 인내 · 극기 · 백절불굴' : '약은 약사에게 · 정해진 양만', c.width / 2, 32); }
-    if (kind === 'side' && ['sci', 'pharm', 'apt', 'gym', 'nurse', 'cafe', 'acad'].includes(id)) for (let x = 14; x < c.width - 30; x += 50) { g.fillStyle = '#e8e2d2'; g.fillRect(x, 6, 36, 24); g.fillStyle = '#a8d8f0'; g.fillRect(x + 3, 9, 30, 18); }
+    if (kind === 'side' && ['sci', 'pharm', 'apt', 'gym', 'nurse', 'cafe', 'acad', 'coffee'].includes(id)) for (let x = 14; x < c.width - 30; x += 50) { g.fillStyle = '#e8e2d2'; g.fillRect(x, 6, 36, 24); g.fillStyle = '#a8d8f0'; g.fillRect(x + 3, 9, 30, 18); }
     if (kind === 'back' && id === 'sci') { const cs = ['#ff9f9f', '#ffd29f', '#fff29f', '#b8f2a8', '#a8e0f2', '#c8b8f2']; for (let i = 0; i < 18; i++) for (let j = 0; j < 4; j++) if (j === 0 ? (i === 0 || i === 17) : !(j < 3 && i > 1 && i < 12)) { g.fillStyle = cs[(i + j) % 6]; g.fillRect(c.width * 0.66 + i * 4.2, 8 + j * 5, 3.6, 4.2); } }
     if (id === 'conv' && kind === 'back') { g.fillStyle = '#ff9f1c'; g.fillRect(0, 4, c.width, 5); g.fillStyle = '#2fa84f'; g.fillRect(0, 9, c.width, 3); }
     if (kind === 'side' && id === 'class') for (let x = 10; x < c.width - 30; x += 46) {                                 // 교실 창문
@@ -1072,6 +1095,10 @@ function buildRooms() {
       P('serving_line', 5.5, 0.6, 0, 0, 1.6); P('cafe_table', 3.0, 3.6, 0, 1.6, 1.6); P('cafe_table', 8.0, 3.6, 0, 1.6, 1.6); P('cafe_table', 8.6, 5.6, 0, 1.6, 1.6);
       P('water_purifier', 10.5, 2.6, -Math.PI / 2, 0.4); P('trash_bins', 10.3, 6.0, -Math.PI / 2, 0.5);
       for (const [n, x, y] of [['kid2_0', 2.0, 4.4], ['kid3_0', 3.6, 4.4], ['friend_0', 7.4, 4.4], ['kid_0', 8.8, 2.8]]) sprite(n, wx(R.ox + x), wz(R.oy + y), y > 4 ? Math.PI : 0);
+    } else if (id === 'coffee') {
+      P('counter', 5.2, 2.3, 0, 1.3); P('coffee_machine', 3.4, 0.45, 0, 0.5); P('coffee_machine', 6.6, 0.45, 0, 0.5); W('menu_wall', 5.0, 0.12, 3.6); P('cake_case', 7.6, 2.4, -Math.PI / 2, 0.8, 1.4);
+      P('cafe_set', 2.6, 3.9, 0, 1.0, 1.5); P('cafe_set', 6.2, 4.0, 0, 1.0, 1.5); P('plant_pot', 0.5, 0.8, 0, 0.4); P('plant_pot', 8.5, 5.3, 0, 0.4); P('mag_rack', 0.45, 2.4, Math.PI / 2, 0.4); W('wall_clock', 1.6, 0.12, 3.6);
+      sprite('mom_0', wx(R.ox + 2.0), wz(R.oy + 3.9), Math.PI / 2); sprite('grandma_0', wx(R.ox + 6.9), wz(R.oy + 4.0), -Math.PI / 2);
     } else if (id === 'acad') {
       P('whiteboard', 4.0, 0.3, 0, 0); P('bookshelf', 7.0, 0.45, 0, 0.8); W('wall_clock', 1.4, 0.12, 3.6); P('plant_pot', 7.5, 5.4, 0, 0.4);
       for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) P('kid_desk', 2.4 + c * 1.8, 2.6 + r * 1.6, 0, 0.6, 1.4);
@@ -1088,7 +1115,7 @@ function buildRooms() {
   }
 }
 const clickables = [];
-function exitRoom() { const R = ROOMS[player.room]; [player.tx, player.ty] = R.exit || [R.door[0], R.door[1] + 0.9]; player.room = null; camT.set(wx(player.tx), 0, wz(player.ty)); say(badges.has(R.id) ? '밖으로 나왔어요.' : '밖으로 나왔어요. (' + roomTodo(R) + ')', '', 2.4); return true; }
+function exitRoom() { const R = ROOMS[player.room]; [player.tx, player.ty] = R.exit || [R.door[0], R.door[1] + 0.9]; if (R.exitTmp) { [player.tx, player.ty] = R.exitTmp; R.exitTmp = null; } player.room = null; camT.set(wx(player.tx), 0, wz(player.ty)); say(badges.has(R.id) ? '밖으로 나왔어요.' : '밖으로 나왔어요. (' + roomTodo(R) + ')', '', 2.4); return true; }
 function checkBadge(id) {
   const R = ROOMS[id]; if (badges.has(id) || !R.quiz || (R.task && !R.taskDone)) return;
   badges.add(id); sfx.good(); setTimeout(() => say(`🏅 ${R.name} 탐험 배지! (${badges.size}/${Object.keys(ROOMS).length})`, 'good', 3.5), 1800); renderList();
@@ -1112,11 +1139,32 @@ function inspect(id, it) {
   return true;
 }
 const nearItem = (R) => R.task && !R.taskDone && R.task.items.find((it) => near(it.at[0], it.at[1], 1.2) && !(R.done.has(it) || (it.step && it.step <= R.step)));
+// 건물 벽으로 걸어가 0.4초 부딪히면 그 건물 안으로 (아파트 → 엘리베이터 앞, 학교 → 가까운 교실·실, 상가 → 가까운 가게)
+const bump = { t: 0 };
+const SHOP_ROOMS = ['conv', 'snack', 'pharm', 'tkd', 'acad', 'coffee'], SCHOOL_ROOMS = ['class', 'sci', 'nurse', 'cafe'];
+function roomForBuilding(x, y) {
+  const ch = GRID.bldg[y]?.[x]; if (!ch || ch === '.') return null;
+  const nearest = (ids, lim) => { let best = null, bd = lim; for (const id of ids) { const R = ROOMS[id]; if (!R) continue; const d = Math.hypot(R.door[0] - x - 0.5, R.door[1] - y - 0.5); if (d < bd) { bd = d; best = id; } } return best; };
+  if (ch === SPRITE_BLDG[0]) return nearest(SCHOOL_ROOMS, 40);
+  if (ch === SPRITE_BLDG[1]) return 'gym';
+  const b = GRID.buildings[ch.charCodeAt(0) - 48]; if (!b) return null;
+  if (b.kind === 'apartments') return 'apt';
+  if (b.kind === 'commercial') return nearest(SHOP_ROOMS, 14);
+  return null;
+}
+function bumpBuilding(dt) {
+  if (player.room || S.active || S.pending || UI.dialog) { bump.t = 0; return; }
+  const X = (player.tx + Math.sin(player.face) * 0.45) | 0, Y = (player.ty + Math.cos(player.face) * 0.45) | 0;
+  if (!blocks[Y * W + X]) { bump.t = 0; return; }
+  const id = roomForBuilding(X, Y); if (!id) { bump.t = 0; return; }
+  bump.t += dt; if (bump.t < 0.4) return; bump.t = 0;
+  const back = [player.tx - Math.sin(player.face) * 0.3, player.ty - Math.cos(player.face) * 0.3];
+  if (enterRoom(id)) ROOMS[id].exitTmp = back;
+}
 function enterRoom(id, far = false) {
   if (player.room || UI.dialog) return false;
   if (S.active || S.pending) { say('지금 미션을 먼저 끝내고 들어가 봐요!', 'warn', 2); return false; }
   const R = ROOMS[id];
-  if (far && !near(R.door[0], R.door[1], 1.5) && !near(R.door[0], R.door[1], 14)) { say(`${R.name} 문 가까이 가서 눌러 봐요 (화살표 🧭)`, '', 2.4); return false; }
   player.room = id; player.tx = R.ox + R.w / 2; player.ty = R.oy + R.h - 1.2; player.face = Math.PI; camT.set(wx(player.tx), 0, wz(player.ty)); say(`${R.name}에 들어왔어요!<br>${R.task?.intro || ''} ${roomTodo(R)}<br><small>사람·물건을 눌러 봐요</small>`, '', 5); return true;
 }
 function roomAction() {
@@ -1263,7 +1311,7 @@ window.G = {
   sig: (id) => sigState(CW.find((c) => c.id === id)), setSimT: (t) => { simT = t; },
   state: () => ({ tx: +player.tx.toFixed(2), ty: +player.ty.toFixed(2), tile: tile(player.tx, player.ty), crouch: player.crouch, ride: player.ride, active: S.active?.id || null, mistakes: S.mistakes, done: Object.keys(S.done), stars: { ...S.stars }, dialog: !!UI.dialog, goal, cars: cars.length, banner: $('banner').textContent }),
   answerAll: () => { let n = 0; while (UI.dialog && n++ < 40) { const ok = [...document.querySelectorAll('#dchoices button')].find((b) => b.dataset.ok === '1' && !b.disabled); if (ok) ok.click(); else if (!$('dnext').classList.contains('hidden')) $('dnext').click(); else break; } },
-  zoom: (z) => { zoom = z; }, room: () => player.room, enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
+  zoom: (z) => { zoom = z; }, room: () => player.room, exit: () => player.room && exitRoom(), rfb: (x, y) => [GRID.bldg[y][x], roomForBuilding(x, y), blocks[y * W + x]], dbgBump: () => ({ t: bump.t, face: player.face, room: player.room, act: S.active?.id, pend: S.pending }), enter: (id) => { const R = ROOMS[id]; G.tp(R.door[0], R.door[1]); return roomAction(); }, act: () => roomAction(), badges: () => [...badges], clicks: () => Object.fromEntries(clickables.map((c) => { const b = new THREE.Box3().setFromObject(c.o), v = b.getCenter(new THREE.Vector3()).project(camera); return [c.key, [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]]; })), roomState: (id) => { const R = ROOMS[id]; return { quiz: !!R.quiz, task: !!R.taskDone, found: R.done ? R.done.size : 0, step: R.step }; },
   talkTo: (id) => { const m = M.find((x) => x.id === id); G.tp(m.npc[2], m.npc[3] + 1.2); startMission(m); },
   missions: () => M.map((m) => m.id), parkCar: () => parkCar ? +tx(parkCar.position.x).toFixed(1) : null, cars: () => cars.map((c) => ({ n: c.name, lane: c.lane, p: +c.p.toFixed(1), v: +c.v.toFixed(1), s: c.special || '' })),
 };

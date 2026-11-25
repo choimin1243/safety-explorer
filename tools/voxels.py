@@ -193,6 +193,7 @@ PEOPLE = {
     'nurse':    dict(shirt='#f4f6f8', pants='#ff9fb8', hair='#3a2a20', adult=True, long_hair=True),
     'cook':     dict(shirt='#f8f8f4', pants='#f0f0ea', hair='#3a2a20', adult=True, hat='#ffffff', mask=True),
     'tutor':    dict(shirt='#8e5cd9', pants='#3c4048', hair='#2b1d14', adult=True, glasses=True),
+    'barista':  dict(shirt='#f4efe4', pants='#2b2b33', hair='#5a3a22', adult=True, vest='#6b4a2a', hat='#2b2b33'),
 }
 BELT = {'master': '#1d1a1a', 'kid_dobok': '#ffd23f'}
 for name, kw in PEOPLE.items():
@@ -2208,6 +2209,69 @@ for nm, fn in (('shade_canopy', shade_canopy), ('shared_kick', shared_kick), ('b
                ('parasol_table', parasol_table), ('clothes_bin', clothes_bin), ('ev_charger', ev_charger), ('delivery_bike', delivery_bike),
                ('cat', cat), ('pigeon', pigeon), ('tree_cherry', tree_cherry), ('tree_pine', tree_pine), ('hedge', hedge),
                ('banner', banner), ('manhole', manhole), ('kid_bike', kid_bike), ('speed_bump', speed_bump), ('safety_bell', phone_booth)):
+    save(nm, fn(), note='prop')
+
+
+# ---------------- 담장: 1칸(=38복셀) 짜리 조각을 이어 붙인다 ----------------
+def school_fence():                                             # 학교 초록 철망 울타리
+    v = Vox(38, 3, 16)
+    v.box(0, 37, 0, 2, 0, 1, '#9aa3ad')
+    for x in (0, 19): v.box(x, x + 1, 0, 2, 0, 15, '#2f7a45')
+    v.box(0, 37, 1, 1, 14, 15, '#2f7a45'); v.box(0, 37, 1, 1, 7, 7, '#2f7a45')
+    for x in range(2, 38, 2):
+        for z in range(2, 14):
+            if (x + z) % 4 == 0: v.put(x, 1, z, '#3f9a5a')
+    return v
+
+
+def apt_fence():                                                # 아파트 철제 담장 + 돌 받침
+    v = Vox(38, 4, 13)
+    v.box(0, 37, 0, 3, 0, 3, '#c8bca8'); v.box(0, 37, 0, 3, 3, 3, '#b0a490')
+    for x in (0, 18): v.box(x, x + 2, 0, 3, 0, 12, '#c8bca8')
+    for x in range(3, 38, 3): v.box(x, x, 1, 2, 4, 11, '#2b3440')
+    v.box(0, 37, 1, 2, 11, 11, '#2b3440'); v.box(0, 37, 1, 2, 7, 7, '#2b3440')
+    return v
+
+
+save('school_fence', school_fence(), note='prop')
+save('apt_fence', apt_fence(), note='prop')
+
+
+# ---------------- 커피숍 안 ----------------
+def cake_case():                                                # 케이크 진열장
+    v = Vox(30, 12, 16)
+    v.box(0, 29, 0, 11, 0, 7, '#6b4a2a'); v.box(0, 29, 0, 11, 8, 8, '#e8dcc8')
+    v.box(0, 29, 11, 11, 9, 15, '#cfe8f5'); v.box(0, 29, 0, 11, 15, 15, '#e8dcc8')
+    for i, x in enumerate(range(2, 28, 5)):
+        c = ['#fff0f4', '#5a3a22', '#ffd23f', '#f7b6c8', '#ffffff', '#c8623a'][i % 6]
+        v.box(x, x + 3, 4, 7, 9, 11, c); v.box(x + 1, x + 2, 5, 6, 12, 12, '#e2463b')
+    return v
+
+
+def cafe_chair_table():                                         # 작은 원탁 + 의자 둘
+    v = Vox(26, 14, 14)
+    v.cyl(13, 7, 5, 10, 10, '#c8a27a'); v.cyl(13, 7, 1, 0, 9, '#3a3f47')
+    for x0 in (1, 21): v.box(x0, x0 + 3, 5, 9, 5, 5, '#6b4a2a'); v.box(x0, x0 + 3, 5, 9, 0, 4, '#3a3f47'); v.box(x0 if x0 < 10 else x0 + 3, x0 if x0 < 10 else x0 + 3, 5, 9, 6, 11, '#6b4a2a')
+    v.box(11, 12, 6, 7, 11, 12, '#ffffff'); v.box(15, 16, 7, 8, 11, 13, '#ffffff')
+    return v
+
+
+def hot_cup():                                                  # 테이블 끝의 뜨거운 커피(김)
+    v = Vox(10, 10, 16)
+    v.box(0, 9, 0, 9, 0, 1, '#c8a27a'); v.box(3, 6, 6, 9, 2, 6, '#ffffff'); v.box(4, 5, 7, 8, 6, 6, '#5a3a22')
+    for z, dx in ((8, 0), (10, 1), (12, 0), (14, 1)): v.put(4 + dx, 7, z, '#e8eef2')
+    return v
+
+
+def menu_wall():                                                # 벽 메뉴판
+    v = Vox(30, 2, 16)
+    v.box(0, 29, 0, 1, 0, 15, '#2b2b33')
+    for z in (12, 9, 6, 3):
+        v.box(2, 14, 1, 1, z, z, '#f4efe4'); v.box(18, 22, 1, 1, z, z, '#ffd23f')
+    return v
+
+
+for nm, fn in (('cake_case', cake_case), ('cafe_set', cafe_chair_table), ('hot_cup', hot_cup), ('menu_wall', menu_wall)):
     save(nm, fn(), note='prop')
 
 
