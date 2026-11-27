@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>가현 안전상자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@600;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage"></div>
+
+<!-- 전시 라벨 (왼쪽 위) -->
+<header id="plate">
+  <div class="kicker"><span class="mark"></span>EXHIBIT No. 015 · 1:150 SAFETY DIORAMA</div>
+  <h1>가현 안전상자 <i class="seal">安</i></h1>
+  <div class="en">Gahyeon Safety Box</div>
+  <div class="meta">인천 서구 루원시티 · 인천가현초등학교 둘레</div>
+  <dl id="facts">
+    <div><dt>교통</dt><dd>스쿨존 · 버스 · 주차장 출입구</dd></div>
+    <div><dt>생활</dt><dd>놀이터 · 킥보드 · 개 · 빙판길</dd></div>
+    <div><dt>신변</dt><dd>모르는 사람 · 길 잃은 동생</dd></div>
+    <div><dt>재난</dt><dd>화재 · 지진 · 번개 · 미세먼지 · 119</dd></div>
+  </dl>
+</header>
+
+<!-- 날씨·시간 (오른쪽 위) -->
+<div id="env">
+  <div class="seg" id="seg-weather">
+    <button data-w="rain" class="on">☔ 비</button><button data-w="clear">☀️ 맑음</button><button data-w="snow">❄️ 눈</button>
+  </div>
+  <div class="seg" id="seg-time">
+    <button data-t="night" class="on">🌙 밤</button><button data-t="day">🌤 낮</button>
+  </div>
+  <button id="snd" class="round" title="소리">🔇</button>
+</div>
+
+<!-- 미션 진행 (오른쪽) -->
+<aside id="prog">
+  <button id="prog-head"><span>안전 미션</span><b id="done">0</b><em>/15</em><span class="stars" id="stars">★ 0</span></button>
+  <ol id="mlist"></ol>
+</aside>
+
+<!-- 축척·방위 (왼쪽 아래) -->
+<div id="scale">
+  <div class="bar"><i></i><i></i><i></i></div>
+  <div class="nums"><span>0</span><span>5</span><span>10</span><span>15 m</span></div>
+  <div class="cap">SCALE 1:150 · <span id="coord">37.48°N 126.67°E</span></div>
+</div>
+
+<!-- 아래 탭 -->
+<nav id="tabs">
+  <button data-v="overview" class="on"><b>1</b><span>전경 보기<small>Overview</small></span></button>
+  <button data-v="street"><b>2</b><span>거리 시점<small>Street view</small></span></button>
+  <button data-v="exploded"><b>3</b><span>층별 분해도<small>Exploded view</small></span></button>
+  <button data-v="tour" class="hot"><b>4</b><span>다음 미션<small>Mission tour</small></span></button>
+</nav>
+
+<!-- 미션 카드 -->
+<section id="card" class="hidden">
+  <div class="c-top"><span id="c-icon"></span><div><small id="c-no">MISSION 01</small><h2 id="c-title"></h2></div><button id="c-close" title="닫기">✕</button></div>
+  <div class="c-who"><span id="c-face"></span><b id="c-name"></b></div>
+  <p id="c-text"></p>
+  <div id="c-choices"></div>
+  <div id="c-why" class="hidden"></div>
+  <button id="c-next" class="hidden">다음 ▶</button>
+</section>
+
+<div id="toast"></div>
+<div id="flash"></div>
+
+<!-- 시작 화면 -->
+<div id="title" class="screen">
+  <div class="tcard">
+    <div class="kicker"><span class="mark"></span>EXHIBIT No. 015 · 1:150</div>
+    <h1>가현 안전상자</h1>
+    <p class="sub">비 오는 밤, 인천가현초 둘레 루원시티를 1:150 미니어처로 옮겼어요.<br>상자 곳곳에 숨은 <b>안전 미션 15개</b>를 찾아 해결해 봐요!</p>
+    <ul>
+      <li>🖱️ 끌어서 돌리기 · 휠/두 손가락으로 확대</li>
+      <li>📍 빛나는 아이콘을 누르면 미션 시작</li>
+      <li>☔ 비 · ❄️ 눈 · ☀️ 맑음, 🌙 밤 · 🌤 낮을 바꿔 봐요</li>
+    </ul>
+    <input id="name" maxlength="10" placeholder="이름 또는 별명 (수료증에 나와요)">
+    <button id="start" disabled>상자를 여는 중…</button>
+    <p class="links"><a href="../gahyeon/">가현 안전 탐험대 (걸어 다니는 버전)</a> · <a href="../">송명초편</a></p>
+    <p class="osm">동네 배치는 실제 지도(© OpenStreetMap 기여자)를 참고해 수업용으로 줄이고 다시 꾸몄어요.</p>
+  </div>
+</div>
+
+<!-- 수료증 -->
+<div id="cert" class="screen hidden">
+  <div class="tcard certcard">
+    <div class="kicker"><span class="mark"></span>CERTIFICATE · 가현 안전상자</div>
+    <h1>안전 탐험 수료증</h1>
+    <p class="who"><b id="cert-name">탐험대원</b> 어린이는</p>
+    <p>인천가현초 둘레 미니어처 동네에서<br>교통·생활·신변·재난 안전 미션 15개를 모두 해결하여<br>이 수료증을 드립니다.</p>
+    <p class="cstars" id="cert-stars"></p>
+    <p class="date" id="cert-date"></p>
+    <div class="row"><button id="print">🖨️ 인쇄</button><button id="again">계속 둘러보기</button></div>
+  </div>
+</div>
+
+<div id="loading"><div class="lbox"><span>디오라마를 짓는 중</span><b id="lp">0%</b></div></div>
+
+<script type="importmap">{ "imports": {
+  "three": "../vendor/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
