@@ -10,6 +10,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { TALK } from './talk.js';
+import { ROOMS } from './rooms.js';
 
 const $ = (id) => document.getElementById(id);
 const lp = (p) => { $('lp').textContent = Math.round(p) + '%'; };
@@ -80,6 +81,8 @@ Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 55, bottom: -55, n
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
 scene.add(sun);
 const flashLight = new THREE.DirectionalLight(0xdfe6ff, 0);
+const fireLight = new THREE.PointLight(0xff7a2a, 0, 7, 1.4); fireLight.position.set(-28.7, 0.9, -21.5); scene.add(fireLight);
+const roomLight = new THREE.PointLight(0xfff0d8, 0, 16, 1.0); roomLight.position.set(300, 3, 0); scene.add(roomLight);
 flashLight.position.set(10, 60, -20);
 scene.add(flashLight);
 
@@ -807,6 +810,7 @@ function makePlayer() {
 }
 let helmetMesh, maskMesh, scooter;
 function blockedAt(x, z) {
+  if (inRoom) return roomBlocked(x, z);
   const tx = FX(x), ty = FZ(z);
   if (tx < 0.3 || ty < 0.3 || tx > W - 0.3 || ty > H - 0.3) return true;
   if (blocks[(ty | 0) * W + (tx | 0)]) return true;
@@ -839,9 +843,10 @@ function updatePlayer(dt, t) {
     let x2 = player.x + dx * sp * dt, z2 = player.z + dz * sp * dt;
     if (!blockedAt(x2, player.z)) player.x = x2; if (!blockedAt(player.x, z2)) player.z = z2;
   } else player.speed = 0;
-  const g = player.g; g.position.set(player.x, hY(player.x, player.z), player.z);
+  const g = player.g; g.position.set(player.x, inRoom ? 0.04 : hY(player.x, player.z), player.z);
   g.rotation.y = lerpAngle(g.rotation.y, player.face, 1 - Math.exp(-dt * 12)); animWalk(g, t, player.speed > 0.1);
-  scooter.visible = player.ride;
+  scooter.visible = player.ride && !player.bike;
+  if (inRoom) return;
   // 차도 안전 규칙
   const tx = FX(player.x), ty = FZ(player.z), c = tileAt(tx, ty), cw = cwAt(tx, ty);
   if (isRoadC(c) && !cw) { warn('🚫 찻길로 건너면 위험해요! 횡단보도로 건너요.'); player.x = player.safe[0]; player.z = player.safe[1]; player.frozen = 0.5; }
@@ -942,7 +947,7 @@ function updateWeather(dt, t) {
     for (let i = 0; i < n; i++) { const o = i * 3; a[o + 1] -= dt * 1.6; a[o] += Math.sin(t * 0.8 + v[i]) * dt * 0.35; if (a[o + 1] < 0) { a[o] = rand(-BOX.x, BOX.x); a[o + 1] = BOX.y1; a[o + 2] = rand(-BOX.z, BOX.z); } }
     snow.geometry.attributes.position.needsUpdate = true;
   }
-  for (const u of umbrellas) u.visible = wx.rain > 0.4;
+  for (const u of umbrellas) u.visible = wx.rain > 0.4 && !inRoom;
   tilt.uniforms.amount.value = view === 'follow' ? 0.55 : 1.0;
   snowCover.material.opacity = wx.snow * 0.55;
 }
@@ -1003,8 +1008,8 @@ const MI = {
   lost: { npc: 'little', at: [47.4, 57.4], goals: [[15.4, 54.8]], rule: '길 잃은 동생은 경비실·아동안전지킴이집 어른에게 함께 가서 알려요.', fx: 'lost', go: '동생 손 잡고 경비실(서쪽 단지 출입구)까지! 동생이 따라오게 천천히, 횡단보도로 건너요.' },
 };
 const ORDER = ['cross', 'bus', 'kick', 'park', 'play', 'stranger', 'fire', 'quake', 'site', 'aid', 'dog', 'storm', 'dust', 'ice', 'lost'];
-const state = { done: {}, name: '' };
-try { const s = JSON.parse(localStorage.getItem('gahyeon-box2') || '{}'); if (s.done) state.done = s.done; if (s.name) state.name = s.name; } catch (e) { /* 저장 불가 */ }
+const state = { done: {}, name: '', rooms: {} };
+try { const s = JSON.parse(localStorage.getItem('gahyeon-box2') || '{}'); if (s.done) state.done = s.done; if (s.name) state.name = s.name; if (s.rooms) state.rooms = s.rooms; } catch (e) { /* 저장 불가 */ }
 const save = () => { try { localStorage.setItem('gahyeon-box2', JSON.stringify(state)); } catch (e) { /* 저장 불가 */ } };
 const pins = {}, npcObjs = {};
 function setupMissions() {
@@ -1034,7 +1039,7 @@ let goalObj;
 function refreshProgress() {
   let n = 0, st = 0;
   for (const id of ORDER) { const s = state.done[id]; pins[id].d.classList.toggle('done', !!s); const li = document.querySelector(`#mlist li[data-id="${id}"]`); li.classList.toggle('done', !!s); li.querySelector('.s').textContent = s ? '★'.repeat(s) : ''; if (s) { n++; st += s; } }
-  $('done').textContent = n; $('stars').textContent = '★ ' + st;
+  $('done').textContent = n; $('stars').textContent = '★ ' + st; $('prog-head').querySelector('em').textContent = '/' + ORDER.length;
 }
 
 let cur = null;
@@ -1056,7 +1061,7 @@ function startMission(id, byWalk) {
   if (!byWalk) { let px = n.x, pz = n.z + 1.1; for (const [dx, dz] of [[0, 1.1], [0, -1.1], [1.1, 0], [-1.1, 0], [0.8, 0.8], [-0.8, 0.8]]) { if (!blockedAt(n.x + dx, n.z + dz) && !isRoadC(tileAt(FX(n.x + dx), FZ(n.z + dz)))) { px = n.x + dx; pz = n.z + dz; break; } } player.x = px; player.z = pz; player.safe = [px, pz]; }
   player.face = Math.atan2(n.x - player.x, n.z - player.z);
   if (view !== 'follow') setView('follow', true); else followSnap(1.2);
-  fxStart(m.fx, id);
+  fxStart(m.fx, id); newFxStart(m.fx);
   showStep();
 }
 function showStep() {
@@ -1064,6 +1069,7 @@ function showStep() {
   const ch = $('c-choices'), why = $('c-why'), nx = $('c-next');
   ch.innerHTML = ''; why.className = 'hidden'; why.textContent = ''; nx.classList.add('hidden');
   if (s.walk) { beginWalk(); return; }
+  if (s.roomEnd) { const id = cur.id; roomObjs[id].quiz = true; endMission(); checkBadge(id); roomHud(); if (!state.rooms[id] && roomObjs[id].R.task && !roomObjs[id].taskDone) toast('💬 이야기 완료! 이제 ' + roomObjs[id].R.task.title + ' (물건을 누르거나 가까이 가서 살펴보기)'); return; }
   const n = NPC[s.who] || {}; $('c-face').textContent = n.face || '🙂'; $('c-name').textContent = NAMES[s.who] || s.who;
   if (s.say) { $('c-text').textContent = s.say; nx.textContent = '다음 ▶'; nx.classList.remove('hidden'); nx.onclick = next; }
   else if (s.ask) {
@@ -1083,7 +1089,7 @@ function next() { audio.click(); cur.step++; showStep(); }
 function beginWalk() {
   cur.walking = true; cur.gi = 0; $('card').classList.add('walk');
   $('c-face').textContent = '🎯'; $('c-name').textContent = '직접 가 보기';
-  placeGoal(); fxWalk(MI[cur.id].fx);
+  placeGoal(); fxWalk(MI[cur.id].fx); newFxWalk(MI[cur.id].fx);
 }
 function placeGoal() {
   const g = MI[cur.id].goals[cur.gi], [x, z] = T2(...g);
@@ -1114,7 +1120,7 @@ function finishMission(stars) {
   if (ORDER.every((k) => state.done[k])) setTimeout(showCert, 900);
 }
 function endMission() {
-  if (!cur) return; fxEnd(MI[cur.id].fx);
+  if (!cur) return; if (cur.kind !== 'room') fxEnd(MI[cur.id].fx);
   goalObj.visible = false; cur = null; $('card').classList.add('hidden'); document.body.classList.remove('busy'); viewShift();
   for (const k in pins) pins[k].d.classList.remove('active');
 }
@@ -1152,6 +1158,7 @@ function fxGoal(id, gi) {
   if (id === 'play' && gi === 0) toast('슝~ 🛝 이제 그네를 피해서 시소 옆으로!');
 }
 function fxEnd(kind) {
+  newFxEnd(kind);
   if (kind === 'fire') { fireOn(false); if (fx.truck) { fx.truck.stopAt = null; fx.truck.keep = false; fx.truck = null; } }
   if (kind === 'stranger' && fx.van) { L.ground.remove(fx.van); fx.van = null; fx.follow = null; resetNpc('stranger'); }
   if (kind === 'play') fx.swing = false;
@@ -1167,13 +1174,13 @@ function fxEnd(kind) {
 }
 function resetNpc(id) { const [x, z] = T2(...MI[id].at); npcObjs[id].position.set(x, hY(x, z), z); }
 function fireOn(on) {
-  fx.fireOn = on;
+  fx.fireOn = on; fireLight.intensity = 0;
   const [fx0, fz0] = T2(15.3, 13.5);
   if (on && !fx.flames) {
     fx.flames = new THREE.Group(); fx.flames.position.set(fx0, 0.1, fz0); L.build.add(fx.flames);
     const fm = new THREE.MeshBasicMaterial({ color: 0xffa040, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
     for (let i = 0; i < 8; i++) { const f = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.5, 6), fm); f.position.set(rand(0, 0.25), rand(0.2, 0.6), rand(-0.5, 0.5)); f.userData.p = Math.random() * 6; fx.flames.add(f); }
-    fx.fireLight = new THREE.PointLight(0xff7a2a, 8, 7, 1.4); fx.fireLight.position.set(0.5, 0.8, 0); fx.flames.add(fx.fireLight);
+    fx.fireLight = fireLight;
     const sm = new THREE.MeshStandardMaterial({ color: 0x3a3a3e, transparent: true, opacity: 0.5, depthWrite: false, roughness: 1 });
     fx.smoke = []; for (let i = 0; i < 26; i++) { const s = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 0), sm); s.userData = { t: Math.random() * 4 }; L.build.add(s); fx.smoke.push(s); }
     fx.smokeO = [fx0, fz0];
@@ -1191,6 +1198,7 @@ function dogOn() {
 function dogOff() { if (fx.dog) { L.ground.remove(fx.dog.g); fx.dog = null; } }
 const nearBuilding = (x, z, r) => { const tx = FX(x), ty = FZ(z); for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const X = (tx + dx) | 0, Y = (ty + dy) | 0; if (X >= 0 && Y >= 0 && X < W && Y < H && blocks[Y * W + X]) return true; } return false; };
 function updateFx(dt, t) {
+  newFxUpdate(dt);
   const amp = fx.swing ? 0.75 : 0.15; swings.forEach((s, i) => (s.rotation.x = Math.sin(t * 2.1 + i * 1.3) * amp));
   seesaw.rotation.z = Math.sin(t * 1.1) * 0.2; ducks.forEach((d, i) => (d.rotation.z = Math.sin(t * 3 + i) * 0.12));
   wheel.rotation.z -= dt * 0.8; craneTop.rotation.y = Math.sin(t * 0.12) * 0.6;
@@ -1199,7 +1207,7 @@ function updateFx(dt, t) {
   craneBeacon.emissiveIntensity = Math.sin(t * 4) > 0.3 ? 4 : 0.2;
   if (fx.fireOn && fx.flames) {
     fx.flames.children.forEach((f) => { if (f.isMesh) { f.scale.setScalar(0.7 + Math.sin(t * 13 + f.userData.p) * 0.35); f.position.y = 0.3 + Math.abs(Math.sin(t * 7 + f.userData.p)) * 0.35; } });
-    fx.fireLight.intensity = 6 + Math.random() * 6;
+    fireLight.intensity = fx.flames.visible ? 6 + Math.random() * 6 : 0;
     fx.smoke.forEach((s) => { s.userData.t += dt; if (s.userData.t > 4) s.userData.t = 0; const k = s.userData.t / 4; s.position.set(fx.smokeO[0] + 0.4 + k * 2.5 + Math.sin(k * 5 + s.id) * 0.4, 0.9 + k * 5, fx.smokeO[1] + Math.cos(k * 4 + s.id) * 0.5); s.scale.setScalar(0.5 + k * 2); });
   }
   if (fx.truck && fx.truck.arrived && !fx.truck.done) { fx.truck.done = true; toast('🚒 소방관이 불을 끄고 있어요!'); setTimeout(() => { if (fx.fireOn) fireOn(false); }, 4000); }
@@ -1260,18 +1268,237 @@ function layerTags() {
   }
 }
 
+/* ───────────── 새 퀘스트 (가현 안전상자에서 추가) ───────────── */
+const TALK2 = {
+  phone: { icon: '📱', title: '스마트폰 보며 걷지 않기', talk: [
+    { who: 'kid4', say: '잠깐만, 이 영상 끝까지 보고 갈게…\n어? 벌써 초록불이네! 보면서 건너면 되겠지?' },
+    { who: 'kid4', ask: '길을 걸을 때 스마트폰은 어떻게 할까?', choices: [
+      { t: '화면을 보면서 천천히 걸으면 괜찮다', why: '화면을 보면 시야가 아주 좁아져서 다가오는 차·자전거를 못 봐요.' },
+      { t: '가방에 넣고, 횡단보도에서는 좌우를 살핀다', ok: true, why: '맞아요! 꼭 써야 하면 안전한 곳에 멈춰 서서 써요.' },
+      { t: '이어폰을 크게 켜고 걷는다', why: '경적이나 차 소리를 못 들어요.' }] }] },
+  bike: { icon: '🚲', title: '자전거는 내려서 끌고', talk: [
+    { who: 'bro2', say: '내 자전거 타 볼래? 길 건너 센트럴타운 쪽까지만 갔다 와!' },
+    { who: 'bro2', ask: '자전거를 타기 전에 꼭 할 일은?', choices: [
+      { t: '안전모를 쓰고 브레이크가 잘 되는지 확인한다', ok: true, why: '맞아요! 밝은 옷을 입고 밤에는 전조등을 켜요.' },
+      { t: '더우니까 안전모는 안 쓴다', why: '넘어지면 머리를 크게 다칠 수 있어요.' }] },
+    { who: 'bro2', ask: '자전거로 횡단보도를 건널 때는?', choices: [
+      { t: '빨리 페달을 밟아 건넌다', why: '횡단보도에서 자전거를 타면 사람과 부딪치고, 차를 피하기도 어려워요.' },
+      { t: '자전거에서 내려서 끌고 건넌다', ok: true, why: '맞아요! 횡단보도에서는 나도 보행자예요.' },
+      { t: '한 손으로 휴대폰을 보며 탄다', why: '두 손으로 핸들을 잡고 앞을 봐야 해요.' }] }] },
+  flood: { icon: '🌊', title: '집중호우 물웅덩이', talk: [
+    { who: 'staff', say: '비가 너무 많이 와서 길 곳곳에 물이 고였어.\n물속에 뚜껑 열린 맨홀이 숨어 있을지도 몰라!' },
+    { who: 'staff', ask: '집중호우로 물이 고인 길은 어떻게 할까?', choices: [
+      { t: '얼마나 깊은지 들어가 본다', why: '물속에 열린 맨홀·구멍이 있을 수 있어요. 빠지면 아주 위험해요.' },
+      { t: '물웅덩이를 피해 높고 안전한 길로 돌아간다', ok: true, why: '맞아요! 하천·지하차도·지하 계단에도 가지 않아요.' },
+      { t: '우산으로 깊이를 재며 건넌다', why: '물살에 넘어질 수 있어요. 들어가지 않아요.' }] }] },
+  heat: { icon: '🥵', title: '폭염 그늘 쉼터', talk: [
+    { who: 'pe', say: '오늘 낮 기온이 35도! 폭염 경보야.\n운동장 흙이 달걀을 익힐 만큼 뜨거워.' },
+    { who: 'pe', ask: '폭염일 때 바깥 활동은 어떻게 할까?', choices: [
+      { t: '물을 자주 마시고 그늘에서 쉬며, 어지러우면 바로 알린다', ok: true, why: '맞아요! 모자를 쓰고 한낮(12~17시) 활동은 줄여요.' },
+      { t: '땀을 많이 흘려야 건강해지니 계속 뛴다', why: '열사병이 올 수 있어요. 쉬어야 해요.' },
+      { t: '목마를 때까지 참았다가 한 번에 마신다', why: '목마르기 전에 조금씩 자주 마셔요.' }] }] },
+};
+Object.assign(TALK, TALK2);
+Object.assign(NPC, {
+  kid4: { kid: true, shirt: 0xff8fb1, bag: true, face: '👧' }, bro2: { shirt: 0x3ab0c8, helmet: 0xe0543a, face: '🧑' }, staff: { vest: true, shirt: 0x5a6a7a, cap: 0x2b3440, face: '🦺' }, pe: { shirt: 0x2f6fd0, pants: 0x2f6fd0, cap: 0xffffff, face: '🧑‍🏫' },
+  clerk: { shirt: 0x1f8a4c, face: '🧑‍💼' }, owner: { shirt: 0xd8352a, cap: 0xffffff, face: '👩‍🍳' }, pharmacist: { shirt: 0xf2f2ee, face: '🧑‍⚕️' }, master: { shirt: 0xf2f2ee, pants: 0xf2f2ee, face: '🥋' },
+  scientist: { shirt: 0xf2f2ee, face: '🧑‍🔬' }, pe_teacher: { shirt: 0x2f6fd0, pants: 0x2f6fd0, face: '🧑‍🏫' }, nurse: { shirt: 0xf2f2ee, cap: 0xffffff, face: '👩‍⚕️' }, cook: { shirt: 0xf2f2ee, cap: 0xffffff, face: '🧑‍🍳' },
+  tutor: { shirt: 0x6b4fd0, face: '🧑‍🏫' }, barista: { shirt: 0x2b1d16, face: '☕' },
+});
+Object.assign(NAMES, { kid4: '친구 지아', bro2: '자전거 탄 형', staff: '구청 직원', pe: '체육 선생님', clerk: '편의점 점원', owner: '분식집 사장님', pharmacist: '약사 선생님', master: '태권도 관장님', scientist: '과학 선생님', pe_teacher: '체육 선생님', nurse: '보건 선생님', cook: '조리사님', tutor: '학원 선생님', barista: '바리스타' });
+Object.assign(MI, {
+  phone: { npc: 'kid4', at: [69.6, 33.2], goals: [[66.5, 39.6]], go: '휴대폰은 가방에 쏙! 루원시티 앞 횡단보도로 건너서 길 건너편 고리까지 가 보자.', rule: '걸을 때 스마트폰은 가방에! 꼭 써야 하면 멈춰 서서 써요.', fx: 'phone' },
+  bike: { npc: 'bro2', at: [52, 38.6], goals: [[65.5, 33.6]], go: '안전모 쓰고 출발! 횡단보도에서는 꼭 내려서 끌고(Shift·천천히 버튼) 건너야 해.', rule: '자전거는 안전모를 쓰고, 횡단보도에서는 내려서 끌고 건너요.', fx: 'bike' },
+  flood: { npc: 'staff', at: [23.2, 47.6], goals: [[33, 49.5]], go: '큰 물웅덩이는 밟지 말고 돌아서, 단지 안 고리까지 가 보렴.', rule: '집중호우 땐 물 고인 길·하천·지하차도를 피하고 높은 길로 돌아가요.', fx: 'flood' },
+  heat: { npc: 'pe', at: [36.8, 23.5], goals: [[43.4, 26.4]], go: '저기 그늘막(노란 고리)으로 가서 물 마시고 쉬자!', rule: '폭염엔 물 자주 마시기 · 그늘에서 쉬기 · 모자 쓰기 · 어지러우면 바로 알리기!', fx: 'heat' },
+});
+ORDER.push('phone', 'bike', 'flood', 'heat');
+const floods = [[26, 48.3, 1.4], [29.6, 50.3, 1.2], [30.8, 47.4, 1.0]];
+let floodMeshes = null;
+function newFxStart(kind) {
+  if (kind === 'flood') { setEnv('weather', 'rain'); floodMeshes = floods.map(([x, y, r]) => { const [px, pz] = T2(x, y); const m = new THREE.Mesh(new THREE.CircleGeometry(r, 24), new THREE.MeshStandardMaterial({ color: 0x1c2a33, roughness: 0.05, metalness: 0.6, transparent: true, opacity: 0.92 })); m.rotation.x = -Math.PI / 2; m.position.set(px, 0.03, pz); L.ground.add(m); return m; }); const [mx, mz] = T2(29.6, 50.3); const mh = cyl(0.3, 0.3, 0.04, M(0x111111), mx, 0.04, mz, L.ground, 16); floodMeshes.push(mh); }
+  if (kind === 'heat') { setEnv('weather', 'clear'); setEnv('time', 'day'); }
+}
+function newFxWalk(kind) {
+  if (kind === 'bike') { player.ride = true; player.bike = true; helmetMesh.visible = true; scooter.visible = false; bikeMesh.visible = true; }
+  if (kind === 'phone') toast('📱 휴대폰은 가방에 넣었어요. 좌우를 살피고 건너요!');
+}
+function newFxEnd(kind) {
+  if (kind === 'flood') { (floodMeshes || []).forEach((m) => L.ground.remove(m)); floodMeshes = null; setEnv('weather', fx.saved.weather); }
+  if (kind === 'heat') { setEnv('weather', fx.saved.weather); setEnv('time', fx.saved.time); }
+  if (kind === 'bike') { player.ride = false; player.bike = false; helmetMesh.visible = false; bikeMesh.visible = false; }
+}
+function newFxUpdate(dt) {
+  if (!cur || !cur.walking) return;
+  const slow = keys.has('ShiftLeft') || keys.has('ShiftRight') || slowBtn;
+  if (cur.id === 'bike') { const cw = cwAt(FX(player.x), FZ(player.z)); if (cw && !slow && player.speed > 1.3) { warn('🚲 횡단보도에서는 자전거에서 내려서 끌고 건너요! (Shift·천천히)'); player.frozen = 0.5; } }
+  if (cur.id === 'flood') for (const [x, y, r] of floods) { const [px, pz] = T2(x, y); if (Math.hypot(px - player.x, pz - player.z) < r * 0.85) { warn('🌊 물웅덩이 속에 맨홀이 있을 수 있어요! 돌아서 가요.'); player.x = player.safe[0]; player.z = player.safe[1]; player.frozen = 0.5; break; } }
+}
+let bikeMesh;
+function buildNewProps() {
+  // 폭염 그늘막
+  const [px, pz] = T2(43.4, 26.4), tent = new THREE.Group(); tent.position.set(px, 0, pz); L.ground.add(tent);
+  for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(0.06, 1.4, 0.06, mat.pole, a * 0.9, 0.7, b * 0.9, tent);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.5, 4), M(0x2f8ad0, { side: THREE.DoubleSide })); roof.rotation.y = Math.PI / 4; roof.position.y = 1.62; roof.castShadow = true; tent.add(roof);
+  cyl(0.1, 0.1, 0.4, M(0x5bc0eb), 0.4, 0.2, 0.2, tent, 10);
+  sign('그늘 쉼터', px, 2.1, pz + 0.01, 0.22, { bg: '#2f8ad0', fg: '#fff', fs: 44 }, L.ground);
+  // 자전거 (내 캐릭터에 붙임)
+  bikeMesh = new THREE.Group(); const fr = M(0xe0543a);
+  for (const z of [-0.3, 0.3]) { const w = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.025, 6, 16), mat.dark); w.position.set(0, 0.16, z); w.rotation.y = Math.PI / 2; bikeMesh.add(w); }
+  box(0.04, 0.04, 0.6, fr, 0, 0.3, 0, bikeMesh); box(0.03, 0.3, 0.03, fr, 0, 0.42, 0.28, bikeMesh); box(0.3, 0.03, 0.03, mat.pole, 0, 0.58, 0.28, bikeMesh);
+  bikeMesh.visible = false; player.g.add(bikeMesh);
+}
+
+/* ───────────── 건물 안 (인형집처럼 잘린 실내) ───────────── */
+const ROOM_IDS = Object.keys(ROOMS);
+const ITEM = { // 과제 물건 → [이모지, 색, 크기]
+  bag_floor: ['🎒', 0xe0543a, 0.4], multitap: ['🔌', 0xffffff, 0.3], scissors: ['✂️', 0xb0b0b0, 0.25], puddle: ['💧', 0x6fb0e0, 0.6], box_stack: ['📦', 0xb08a5a, 0.6], cable_floor: ['➰', 0x222222, 0.5],
+  pot_handle: ['🍳', 0x555555, 0.4], pill_bottle: ['💊', 0xff8a8a, 0.25], syrup: ['🧴', 0xd88a5a, 0.25], gummy_jar: ['🍬', 0xff8fb1, 0.3], shoe_loose: ['👟', 0xffffff, 0.3], dumbbell: ['🏋️', 0x444444, 0.35],
+  elev_panel: ['🔔', 0xff2a1a, 0.35], stairs_door: ['🚪', 0x2fa84f, 0.8], elevator: ['🛗', 0x9aa0a6, 0.9], goggles: ['🥽', 0x5bc0eb, 0.25], lab_coat: ['🥼', 0xf2f2ee, 0.45], alcohol_lamp: ['🔥', 0xffa040, 0.3],
+  beaker: ['🧪', 0x7fd18b, 0.3], ball_floor: ['🏀', 0xe0743a, 0.35], vault_box: ['📦', 0xd8b23a, 0.7], sink: ['🚰', 0xdfe6ea, 0.5], first_aid_kit: ['🧰', 0xff4a3a, 0.35], bandage: ['🩹', 0xf0c9a0, 0.25],
+  tray_stack: ['🍽️', 0x9aa0a6, 0.4], hot_soup: ['🍲', 0xd8352a, 0.35], cafe_table: ['🪑', 0x8a6a4a, 0.6], exit_sign_blocked: ['🚪', 0x2fa84f, 0.7], heater: ['♨️', 0xff6a3a, 0.5], hot_cup: ['☕', 0xffffff, 0.25],
+};
+const ROOM_BASE_X = 220;
+const roomObjs = {}, doorLabels = {};
+let inRoom = null;
+function roomOrigin(i) { return [ROOM_BASE_X + i * 26, 0]; }
+function buildRooms() {
+  ROOM_IDS.forEach((id, i) => {
+    const R = ROOMS[id], g = new THREE.Group(), [ox, oz] = roomOrigin(i); g.position.set(ox, 0, oz); g.visible = false; scene.add(g);
+    const w = R.w, h = R.h, wall = M(new THREE.Color(R.wall)), floor = M(new THREE.Color(R.floor), { roughness: 0.5 });
+    slab(-0.3, w + 0.3, -0.6, 0, -0.3, h + 0.3, M(0x2a2228), g); slab(0, w, 0, 0.04, 0, h, floor, g);
+    slab(-0.2, w + 0.2, 0, 1.4, -0.2, 0, wall, g); slab(-0.2, 0, 0, 1.4, 0, h, wall, g); slab(w, w + 0.2, 0, 0.5, 0, h, wall, g);
+    slab(-0.2, w + 0.2, 1.4, 1.48, -0.2, 0.1, M(0x8d7a66), g);
+    slab(w * 0.3, w * 0.7, 1.32, 1.36, 0.05, 0.15, GLOW(0xfff4e0, 1.2), g, { cast: false });
+    sign(R.name.replace(/^\S+ /, ''), w / 2, 1.18, 0.03, 0.2, { bg: '#21314a', fg: '#fff', fs: 54 }, g);
+    const cols = []; // 가구 충돌 [x0,z0,x1,z1]
+    const furn = (x0, z0, x1, z1, y1, m) => { slab(x0, x1, 0, y1, z0, z1, m, g); cols.push([x0, z0, x1, z1]); };
+    const desk = M(0xc8a27a), dark = M(0x3a3438), white = M(0xf2f2ee), shelf = M(0xd9d2c6);
+    if (id === 'class' || id === 'acad') { slab(w * 0.25, w * 0.75, 0.42, 1.02, 0.02, 0.08, M(id === 'class' ? 0x2f5a3a : 0xffffff), g); for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) furn(1.6 + c * 2.4, 2.6 + r * 1.7, 2.6 + c * 2.4, 3.2 + r * 1.7, 0.3, desk); }
+    if (id === 'sci') { for (const c of [0, 1]) furn(2.6 + c * 3.4, 3.4, 4.6 + c * 3.4, 4.4, 0.38, dark); slab(0.1, 0.6, 0, 1.0, 4.6, 6.4, shelf, g); }
+    if (id === 'conv' || id === 'pharm') { furn(0.6, 0.1, w - 0.6, 0.6, 0.9, shelf); furn(0.8, 2.6, 3.6, 3.0, 0.6, shelf); furn(w - 2.2, 3.4, w - 0.4, 4.2, 0.45, white); if (id === 'conv') slab(w - 1.4, w - 0.2, 0, 1.05, 0.1, 0.8, GLOW(0xbfe3ff, 0.8), g); }
+    if (id === 'snack' || id === 'coffee' || id === 'cafe') { furn(2.0, 0.1, w - 0.6, 0.8, 0.5, white); for (const [x, z] of [[1.4, 3.6], [3.4, 3.8], [5.6, 3.4]]) if (x < w - 1) furn(x - 0.4, z - 0.4, x + 0.4, z + 0.4, 0.3, desk); }
+    if (id === 'tkd') { slab(0.3, w - 0.3, 0.04, 0.07, 0.6, h - 0.8, M(0xd8352a), g); cyl(0.2, 0.2, 0.75, M(0x2b2520), 1.2, 0.5, 1.4, g, 12); cols.push([0.9, 1.1, 1.5, 1.7]); }
+    if (id === 'gym') { slab(w / 2 - 0.5, w / 2 + 0.5, 0.95, 1.35, 0.05, 0.1, white, g); cyl(0.22, 0.22, 0.03, M(0xe0543a), w / 2, 0.92, 0.35, g, 16); slab(1, 3.5, 0.04, 0.12, h - 2, h - 0.8, M(0x2f6fd0), g); }
+    if (id === 'nurse') { for (const x of [1.0, 2.8]) furn(x, 0.3, x + 1.2, 2.2, 0.3, white); slab(w - 1.4, w - 0.2, 0, 1.05, 0.1, 0.6, shelf, g); }
+    if (id === 'apt') { slab(3.0, 4.4, 0, 1.2, 0.02, 0.1, M(0x9aa0a6, { metalness: 0.7, roughness: 0.3 }), g); slab(0.4, 1.6, 0.4, 0.9, 0.02, 0.2, M(0x8d7a66), g); slab(6.0, 7.2, 0, 1.15, 0.02, 0.1, M(0x2fa84f), g); }
+    // 사람
+    const n = person(NPC[R.npc.who] || {}); n.position.set(R.npc.x, 0.04, R.npc.y); g.add(n);
+    // 나가는 문 (앞쪽 가운데)
+    const ex = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.8), new THREE.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.6 })); ex.rotation.x = -Math.PI / 2; ex.position.set(w / 2, 0.06, h - 0.45); g.add(ex);
+    const el = document.createElement('div'); el.className = 'roomtag'; el.textContent = '🚪 나가기'; const eo = new CSS2DObject(el); eo.position.set(w / 2, 0.5, h - 0.45); g.add(eo);
+    el.addEventListener('pointerdown', (e) => e.stopPropagation()); el.onclick = (e) => { e.stopPropagation(); exitRoom(); };
+    // 과제 물건
+    const items = [];
+    if (R.task) R.task.items.forEach((it, k) => {
+      const [emo, col, sz] = ITEM[it.spr] || ['❓', 0xffffff, 0.3];
+      const ix = clamp(it.x, 0.3, w - 0.3), iz = clamp(it.y, 0.3, h - 0.3);
+      const mesh = it.spr === 'puddle' ? new THREE.Mesh(new THREE.CircleGeometry(sz, 18), new THREE.MeshStandardMaterial({ color: col, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.7 })) : new THREE.Mesh(new THREE.BoxGeometry(sz, sz, sz), M(col));
+      if (it.spr === 'puddle') { mesh.rotation.x = -Math.PI / 2; mesh.position.set(ix, 0.05, iz); } else { mesh.position.set(ix, iz < 0.4 ? 0.6 : sz / 2 + 0.04, iz); mesh.castShadow = true; }
+      g.add(mesh);
+      const d = document.createElement('button'); d.className = 'item'; d.innerHTML = `<span>${emo}</span>`; const o = new CSS2DObject(d); o.position.set(ix, (iz < 0.4 ? 0.6 : sz) + 0.45, iz); g.add(o);
+      d.addEventListener('pointerdown', (e) => e.stopPropagation()); d.onclick = (e) => { e.stopPropagation(); pickItem(id, k); };
+      items.push({ it, d, x: ix, z: iz });
+    });
+    g.traverse((o) => { if (o.isCSS2DObject) o.visible = false; });
+    roomObjs[id] = { g, R, cols, npc: n, items, found: new Set(), stepN: 1, quiz: false, origin: [ox, oz] };
+    // 바깥 문 표시
+    const [dx, dz] = T2(R.door[0], R.door[1]);
+    const dm = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.42, 20), new THREE.MeshBasicMaterial({ color: 0x7fd1ff, transparent: true, opacity: 0.85, depthWrite: false })); dm.rotation.x = -Math.PI / 2; dm.position.set(dx, hY(dx, dz) + 0.03, dz); L.ground.add(dm);
+    const dl = document.createElement('div'); dl.className = 'door'; dl.innerHTML = `🚪 <b>${R.name.replace(/^\S+ /, '')}</b>`; const dlo = new CSS2DObject(dl); dlo.position.set(dx, hY(dx, dz) + 0.9, dz); L.ground.add(dlo);
+    dl.addEventListener('pointerdown', (e) => e.stopPropagation()); dl.onclick = (e) => { e.stopPropagation(); enterRoom(id); };
+    doorLabels[id] = dl;
+  });
+  const hd = document.createElement('li'); hd.className = 'sep'; hd.textContent = '🏠 건물 안 탐험 (배지)'; $('mlist').appendChild(hd);
+  for (const id of ROOM_IDS) { const li = document.createElement('li'); li.dataset.room = id; const R = ROOMS[id]; li.innerHTML = `<span class="ic">${R.name.split(' ')[0]}</span><span class="t">${R.name.replace(/^\S+ /, '')}</span><span class="s"></span>`; li.onclick = () => enterRoom(id); $('mlist').appendChild(li); }
+  refreshRooms();
+}
+function nearDoor() { if (inRoom || cur) return null; let best = null, bd = 1.3; for (const id of ROOM_IDS) { const [dx, dz] = T2(...ROOMS[id].door); const d = Math.hypot(dx - player.x, dz - player.z); if (d < bd) { bd = d; best = id; } } return best; }
+function enterRoom(id) {
+  if (cur) endMission();
+  { const O2 = roomObjs[id]; roomLight.position.set(O2.origin[0] + O2.R.w / 2, 3, O2.origin[1] + O2.R.h / 2); roomLight.intensity = 5; }
+  const O = roomObjs[id]; inRoom = id; O.g.visible = true; root.visible = false; for (const k of ROOM_IDS) roomObjs[k].g.traverse((o) => { if (o.isCSS2DObject) o.visible = k === id; });
+  player.prevOut = player.x === undefined ? null : [player.x, player.z];
+  const [dx, dz] = T2(...ROOMS[id].door); player.outPos = [dx, dz + 0.0];
+  L.ground.remove(player.g); O.g.add(player.g); player.x = O.R.w / 2; player.z = O.R.h - 0.55; player.face = Math.PI; player.safe = [player.x, player.z];
+  document.body.classList.add('inroom');
+  view = 'follow'; document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'follow'));
+  explodeGoal = 0;
+  const c = new THREE.Vector3(O.origin[0] + O.R.w / 2, 0.6, O.origin[1] + O.R.h / 2);
+  flyTo(c.clone().add(new THREE.Vector3(0, 8, 10)), c, 1.0);
+  audio.click();
+  const T = O.R.task; toast(`${O.R.name}에 들어왔어요! 💬 사람에게 다가가 말 걸기${T ? ' · 🔍 ' + T.title : ''}`);
+  roomHud();
+}
+function exitRoom() {
+  if (!inRoom) return; const O = roomObjs[inRoom]; if (cur && cur.kind === 'room') endMission();
+  O.g.visible = false; root.visible = true; roomLight.intensity = 0; O.g.traverse((o) => { if (o.isCSS2DObject) o.visible = false; }); O.g.remove(player.g); L.ground.add(player.g);
+  inRoom = null; const [dx, dz] = player.outPos; let px = dx, pz = dz;
+  for (const [ax, az] of [[0, 0.8], [0.8, 0], [-0.8, 0], [0, -0.8], [0.6, 0.6], [-0.6, 0.6]]) if (!blockedAt(dx + ax, dz + az)) { px = dx + ax; pz = dz + az; break; }
+  player.x = px; player.z = pz; player.safe = [px, pz]; document.body.classList.remove('inroom'); $('roomhud').classList.add('hidden');
+  lastP = null; followSnap(1.0); audio.click();
+}
+function roomHud() {
+  if (!inRoom) return; const O = roomObjs[inRoom], T = O.R.task; const h = $('roomhud'); h.classList.remove('hidden');
+  const done = state.rooms[inRoom];
+  h.innerHTML = `<b>${O.R.name}</b><span>${O.quiz ? '✅' : '💬'} 이야기·퀴즈</span>` + (T ? `<span>${T.mode === 'hunt' ? '🔍' : '🔢'} ${T.title} ${T.mode === 'hunt' ? O.found.size + '/' + T.items.length : (O.taskDone ? '완료' : (O.stepN - 1) + '/' + T.items.filter((i) => !i.bad).length)}</span>` : '') + (done ? '<span class="ok">🏅 배지 획득!</span>' : '') + '<button id="rh-exit">🚪 나가기</button>';
+  $('rh-exit').onclick = () => exitRoom();
+}
+function pickItem(id, k) {
+  const O = roomObjs[id], T = O.R.task, I = O.items[k]; if (!T || O.taskDone) return;
+  if (T.mode === 'hunt') { if (O.found.has(k)) return; O.found.add(k); I.d.classList.add('ok'); audio.good(); toast(`🔍 ${I.it.name} — ${I.it.why}`); if (O.found.size === T.items.length) { O.taskDone = true; toast(`🎉 ${T.title} 성공!`); } }
+  else {
+    if (I.it.bad) { I.d.classList.add('no'); audio.bad(); toast(`❌ ${I.it.name} — ${I.it.why}`); return; }
+    if (I.it.step === O.stepN) { O.stepN++; I.d.classList.add('ok'); I.d.querySelector('span').textContent = String(I.it.step); audio.good(); toast(`⭕ ${I.it.step}. ${I.it.name} — ${I.it.why}`); if (O.stepN > T.items.filter((i) => !i.bad).length) { O.taskDone = true; toast(`🎉 ${T.title} 성공!`); } }
+    else { audio.bad(); toast(`🤔 순서가 달라요! ${O.stepN}번째로 할 일을 찾아봐요.`); }
+  }
+  checkBadge(id); roomHud();
+}
+function checkBadge(id) {
+  const O = roomObjs[id]; if (state.rooms[id] || !O.quiz || (O.R.task && !O.taskDone)) return;
+  state.rooms[id] = true; save(); refreshRooms(); audio.good(); setTimeout(() => toast(`🏅 ${O.R.name} 탐험 배지! (${Object.keys(state.rooms).length}/${ROOM_IDS.length})`), 900);
+}
+function refreshRooms() {
+  for (const id of ROOM_IDS) { doorLabels[id].classList.toggle('done', !!state.rooms[id]); const li = document.querySelector(`#mlist li[data-room="${id}"]`); if (li) { li.classList.toggle('done', !!state.rooms[id]); li.querySelector('.s').textContent = state.rooms[id] ? '🏅' : ''; } }
+  $('rdone').textContent = Object.keys(state.rooms).length;
+}
+function startRoomTalk(id) {
+  const O = roomObjs[id]; if (cur) return;
+  cur = { kind: 'room', id, step: 0, mistakes: 0, talk: [...O.R.talk, { roomEnd: true }], walking: false };
+  $('c-icon').textContent = O.R.name.split(' ')[0]; $('c-title').textContent = O.R.name.replace(/^\S+ /, ''); $('c-no').textContent = 'INSIDE · 건물 탐험';
+  $('card').classList.remove('hidden', 'walk'); viewShift(); showStep();
+}
+function updateRoom(dt, t) {
+  if (!inRoom) return; const O = roomObjs[inRoom];
+  const np = O.npc.position; if (!cur && Math.hypot(np.x - player.x, np.z - player.z) < 1.1 && !O.talkCool) { O.talkCool = true; startRoomTalk(inRoom); }
+  if (Math.hypot(np.x - player.x, np.z - player.z) > 1.8) O.talkCool = false;
+  O.npc.rotation.y = Math.atan2(player.x - np.x, player.z - np.z);
+  if (!cur && player.z > O.R.h - 0.5 && Math.abs(player.x - O.R.w / 2) < 0.7 && player.speed > 0.1 && Math.abs(Math.cos(player.face)) > 0.5 && Math.cos(player.face) > 0) exitRoom();
+  // 가까운 물건은 Space/버튼으로 살펴보기
+  let near = -1, bd = 0.9; O.items.forEach((I, k) => { const d = Math.hypot(I.x - player.x, I.z - player.z); if (d < bd) { bd = d; near = k; } }); O.nearItem = near;
+}
+function roomBlocked(x, z) { const O = roomObjs[inRoom]; if (x < 0.25 || x > O.R.w - 0.25 || z < 0.45 || z > O.R.h - 0.1) return true; for (const [a, b, c, d] of O.cols) if (x > a - 0.15 && x < c + 0.15 && z > b - 0.15 && z < d + 0.15) return true; return false; }
+// 행동 버튼 (문 들어가기 · 물건 살펴보기 · 나가기)
+function updateAct() {
+  const b = $('act'); let lbl = null, fn = null;
+  if (inRoom) { const O = roomObjs[inRoom]; if (O.nearItem >= 0 && O.R.task && !O.taskDone) { lbl = '🔍 살펴보기'; const k = O.nearItem; fn = () => pickItem(inRoom, k); } else if (player.z > O.R.h - 1.2 && Math.abs(player.x - O.R.w / 2) < 1.2) { lbl = '🚪 나가기'; fn = exitRoom; } }
+  else { const id = nearDoor(); if (id) { lbl = '🚪 ' + ROOMS[id].name.replace(/^\S+ /, '') + ' 들어가기'; fn = () => enterRoom(id); } }
+  if (lbl) { b.textContent = lbl; b.classList.remove('hidden'); b.onclick = fn; actFn = fn; } else { b.classList.add('hidden'); actFn = null; }
+}
+let actFn = null;
 /* ───────────── 시점 ───────────── */
 let view = 'overview';
 const fly = { t: 1, dur: 1, p0: new THREE.Vector3(), p1: new THREE.Vector3(), t0: new THREE.Vector3(), t1: new THREE.Vector3() };
 function flyTo(pos, target, dur = 1.6) { if (camera.aspect < 1) pos = target.clone().add(pos.clone().sub(target).multiplyScalar(1.5)); fly.p0.copy(camera.position); fly.t0.copy(controls.target); fly.p1.copy(pos); fly.t1.copy(target); fly.t = 0; fly.dur = dur; }
 const FOLLOW_OFF = new THREE.Vector3(0, 15, 11);
-function followSnap(dur = 1.4) { const t = new THREE.Vector3(player.x, 0.5, player.z); const off = camera.position.clone().sub(controls.target); if (view !== 'follow' || off.length() > 30 || off.length() < 4) off.copy(FOLLOW_OFF); flyTo(t.clone().add(off), t, dur); }
+function followSnap(dur = 1.4) { const t = player.g.getWorldPosition(new THREE.Vector3()); t.y = 0.5; const off = camera.position.clone().sub(controls.target); if (view !== 'follow' || off.length() > 30 || off.length() < 4) off.copy(FOLLOW_OFF); flyTo(t.clone().add(off), t, dur); }
 const VIEWS = {
   overview: () => { flyTo(new THREE.Vector3(58, 112, 104), new THREE.Vector3(0, 0, 4)); controls.autoRotate = !cur; explodeGoal = 0; },
   follow: () => { controls.autoRotate = false; explodeGoal = 0; followSnap(); },
   exploded: () => { flyTo(new THREE.Vector3(120, 96, 168), new THREE.Vector3(-10, 6, 0)); controls.autoRotate = false; explodeGoal = 1; },
 };
 function setView(v, silent) {
+  if (inRoom && v !== 'follow') exitRoom();
   if (v === 'tour') { const id = ORDER.find((k) => !state.done[k]) || ORDER[0]; startMission(id, false); return; }
   if (v === 'exploded' && cur && !silent) endMission();
   view = v; VIEWS[v]();
@@ -1281,7 +1508,7 @@ function setView(v, silent) {
 let lastP = null;
 function followCam() {
   if (!player.g) return;
-  const p = new THREE.Vector3(player.x, 0.5, player.z);
+  const p = player.g.getWorldPosition(new THREE.Vector3()); p.y = 0.5;
   if (view === 'follow' && fly.t >= 1 && lastP) { const d = p.clone().sub(lastP); camera.position.add(d); controls.target.add(d); }
   else if (view === 'follow' && fly.t < 1) { fly.t1.copy(p); }
   lastP = p;
@@ -1301,6 +1528,7 @@ addEventListener('keydown', (e) => {
   if (/^(Arrow|Key[WASD])/.test(e.code) && view !== 'follow' && view !== 'exploded') setView('follow');
   if (e.code === 'Escape' && cur) endMission();
   if ((e.code === 'Enter' || e.code === 'Space') && cur && !$('c-next').classList.contains('hidden')) $('c-next').click();
+  else if ((e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') && !cur && actFn) actFn();
 });
 addEventListener('keyup', (e) => keys.delete(e.code));
 addEventListener('blur', () => keys.clear());
@@ -1316,8 +1544,8 @@ slowEl.addEventListener('pointerdown', (e) => { e.preventDefault(); slowBtn = tr
 const endSlow = () => { slowBtn = false; slowEl.classList.remove('on'); };
 slowEl.addEventListener('pointerup', endSlow); slowEl.addEventListener('pointercancel', endSlow); slowEl.addEventListener('pointerleave', endSlow);
 function showCert() {
-  $('cert-name').textContent = state.name || '탐험대원';
-  const st = ORDER.reduce((a, k) => a + (state.done[k] || 0), 0); $('cert-stars').textContent = '★'.repeat(Math.round(st / 15)) + `  (${st} / 45)`;
+  $('cert-name').textContent = state.name || '탐험대원'; $('cert-n').textContent = ORDER.length;
+  const st = ORDER.reduce((a, k) => a + (state.done[k] || 0), 0); $('cert-stars').textContent = '★'.repeat(Math.max(1, Math.round(st / ORDER.length))) + `  (${st} / ${ORDER.length * 3})  ·  🏅 건물 ${Object.keys(state.rooms).length}/${ROOM_IDS.length}`;
   const d = new Date(); $('cert-date').textContent = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.  인천가현초등학교`;
   $('cert').classList.remove('hidden');
 }
@@ -1350,7 +1578,7 @@ function frame() {
   explodeT = lerp(explodeT, explodeGoal, 1 - Math.exp(-dt * 3));
   for (const k in L) L[k].position.y = EXPLODE[k] * explodeT;
   for (const l of layerLines) l.material.opacity = explodeT;
-  updateSignals(dt, t); updateTraffic(dt, t); updateGarageCar(dt, t); updateWalkers(dt, t); updateFx(dt, t); updateMission(dt, t); updateWeather(dt, t);
+  updateSignals(dt, t); updateTraffic(dt, t); updateGarageCar(dt, t); updateWalkers(dt, t); updateFx(dt, t); updateMission(dt, t); updateRoom(dt, t); updateAct(); updateWeather(dt, t);
   controls.update();
   if (fx.shake > 0.005) root.position.set(rand(-1, 1) * fx.shake, 0, rand(-1, 1) * fx.shake); else root.position.set(0, 0, 0);
   composer.render(); labelR.render(scene, camera);
@@ -1364,7 +1592,7 @@ function frame() {
   W = GRID.W; H = GRID.H; W2 = W / 2; D2 = H / 2;
   Object.assign(BOX, { x: W2, z: D2 });
   lp(5);
-  const tasks = [prepMap, buildGroundPlane, buildSidewalks, buildUnder, buildBuildings, buildProps, buildWeather, layerTags, spawnWalkers, makePlayer, setupMissions];
+  const tasks = [prepMap, buildGroundPlane, buildSidewalks, buildUnder, buildBuildings, buildProps, buildWeather, layerTags, spawnWalkers, makePlayer, buildNewProps, setupMissions, buildRooms];
   for (const f of tasks) { f(); await new Promise((r) => setTimeout(r, 0)); }
   for (const k of ['E', 'Wb', 'N', 'Sb']) for (let i = 0; i < 3; i++) { const Ln = LANES[k]; spawnCar(k, KINDS[i % KINDS.length], { at: Ln.from + Ln.dir * (10 + i * 18), v: 3 }); }
   resize(); setEnv('weather', 'rain');
@@ -1373,4 +1601,4 @@ function frame() {
   $('start').disabled = false; $('start').textContent = state.name || Object.keys(state.done).length ? '이어서 탐험하기' : '상자 열고 출발!';
   frame();
 })();
-window.__box = { phaseOf, T2, sigClock, setView, startMission, setEnv, state, cars, player, keys, get cur() { return cur; }, tp: (tx, ty) => { const [x, z] = T2(tx, ty); player.x = x; player.z = z; player.safe = [x, z]; } };
+window.__box = { MI, enterRoom, exitRoom, roomObjs, pickItem, get inRoom() { return inRoom; }, ORDER, phaseOf, T2, sigClock, setView, startMission, setEnv, state, cars, player, keys, get cur() { return cur; }, tp: (tx, ty) => { const [x, z] = T2(tx, ty); player.x = x; player.z = z; player.safe = [x, z]; } };
